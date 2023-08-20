@@ -1,0 +1,51 @@
+[
+    {
+        "dataset_name": "birds",
+        "baseline_accuracy": 0.47058823529411764,
+        "baseline_hamming_loss": 0.05328336320677855,
+        "stacking_accuracy": 0.47058823529411764,
+        "stacking_hamming_loss": 0.05328336320677855
+    },
+    {
+        "dataset_name": "emotions",
+        "baseline_accuracy": 0.01485148514851485,
+        "baseline_hamming_loss": 0.3250825082508251,
+        "stacking_accuracy": 0.01485148514851485,
+        "stacking_hamming_loss": 0.3250825082508251
+    },
+    {
+        "dataset_name": "rcv1subset2",
+        "baseline_accuracy": 0.0,
+        "baseline_hamming_loss": 0.034056105610561056,
+        "stacking_accuracy": 0.0,
+        "stacking_hamming_loss": 0.034095709570957096
+    },
+    {
+        "dataset_name": "rcv1subset3",
+        "baseline_accuracy": 0.0,
+        "baseline_hamming_loss": 0.03394719471947195,
+        "stacking_accuracy": 0.0,
+        "stacking_hamming_loss": 0.03397029702970297
+    },
+    {
+        "dataset_name": "rcv1subset4",
+        "baseline_accuracy": 0.0,
+        "baseline_hamming_loss": 0.029848184818481848,
+        "stacking_accuracy": 0.0,
+        "stacking_hamming_loss": 0.029854785478547856
+    },
+    {
+        "dataset_name": "rcv1subset5",
+        "baseline_accuracy": 0.0,
+        "baseline_hamming_loss": 0.033686468646864684,
+        "stacking_accuracy": 0.0,
+        "stacking_hamming_loss": 0.033722772277227725
+    },
+    {
+        "dataset_name": "scene",
+        "baseline_accuracy": 0.5869565217391305,
+        "baseline_hamming_loss": 0.08416945373467112,
+        "stacking_accuracy": 0.5869565217391305,
+        "stacking_hamming_loss": 0.08416945373467112
+    }
+]
