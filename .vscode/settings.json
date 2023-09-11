@@ -1,6 +1,9 @@
 {
     "cSpell.words": [
         "classif",
-        "ndarray"
+        "hstack",
+        "ndarray",
+        "preds",
+        "todense"
     ]
 }
