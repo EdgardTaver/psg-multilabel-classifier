@@ -14,20 +14,19 @@ class CalculateLabelsCorrelationWithFTest:
             raise ValueError("alpha must be >= 0.0 and <= 1.0")
 
         self.alpha = alpha
-        self.correlated_labels_map = pd.DataFrame()
 
-    def get(self, labels: Any):
+    def get(self, labels: Any) -> pd.DataFrame:
         labels_count = labels.shape[1]
 
         f_tested_label_pairs = self.calculate_f_test_for_all_label_pairs(
             labels_count, labels
         )
 
-        self.correlated_labels_map = self.get_map_of_correlated_labels(
+        correlated_labels_map = self.get_map_of_correlated_labels(
             labels_count, f_tested_label_pairs
         )
 
-        return self.correlated_labels_map
+        return correlated_labels_map
 
     def calculate_f_test_for_all_label_pairs(
         self, labels_count: int, labels: Any
