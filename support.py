@@ -8,7 +8,7 @@ from sklearn.feature_selection import f_classif
 class CalculateLabelsCorrelationWithFTest:
     def __init__(
         self,
-        alpha: float = 0.5,
+        alpha: float,
     ):
         if alpha < 0.0 or alpha > 1.0:
             raise ValueError("alpha must be >= 0.0 and <= 1.0")
