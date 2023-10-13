@@ -11,37 +11,37 @@ class CalculateLabelsCorrelationWithFTest:
         alpha: float = 0.5,
     ):
         if alpha < 0.0 or alpha > 1.0:
-            raise Exception("alpha must be >= 0.0 and <= 1.0")
+            raise ValueError("alpha must be >= 0.0 and <= 1.0")
 
         self.alpha = alpha
         self.correlated_labels_map = pd.DataFrame()
-        self.labels_count = 0
 
-    def fit(self, X: Any, y: Any):
-        self.labels_count = y.shape[1]
+    def get(self, labels: Any):
+        labels_count = labels.shape[1]
 
-        f_tested_label_pairs = self.calculate_f_test_for_all_label_pairs(y)
+        f_tested_label_pairs = self.calculate_f_test_for_all_label_pairs(
+            labels_count, labels
+        )
 
         self.correlated_labels_map = self.get_map_of_correlated_labels(
-            f_tested_label_pairs
+            labels_count, f_tested_label_pairs
         )
 
         return self.correlated_labels_map
 
     def calculate_f_test_for_all_label_pairs(
-        self, label_classifications: Any
-    ) -> List[Dict[str, Any]]:
+        self, labels_count: int, labels: Any
+    ) -> pd.DataFrame:
         results = []
-
-        for i in range(0, self.labels_count):
-            for j in range(0, self.labels_count):
+        for i in range(0, labels_count):
+            for j in range(0, labels_count):
                 if i == j:
                     continue
 
-                X = label_classifications.todense()[:, i]
+                X = labels.todense()[:, i]
                 base_label = self.convert_matrix_to_array(X)
 
-                y = label_classifications.todense()[:, j]
+                y = labels.todense()[:, j]
                 against_label = self.convert_matrix_to_vector(y)
 
                 f_test_result = f_classif(base_label, against_label)[0]
@@ -54,7 +54,7 @@ class CalculateLabelsCorrelationWithFTest:
                     }
                 )
 
-        return results
+        return pd.DataFrame(results)
 
     def convert_matrix_to_array(self, matrix: Any):
         return np.asarray(matrix).reshape(-1, 1)
@@ -63,21 +63,18 @@ class CalculateLabelsCorrelationWithFTest:
         return np.asarray(matrix).reshape(-1)
 
     def get_map_of_correlated_labels(
-        self, f_test_results: List[Dict[str, Any]]
+        self, labels_count: int, f_test_results: pd.DataFrame
     ) -> pd.DataFrame:
-        temp_df = pd.DataFrame(f_test_results)
-
-        sorted_temp_df = temp_df.sort_values(
+        sorted_f_test_results = f_test_results.sort_values(
             by=["label_being_tested", "f_test_result"], ascending=[True, False]
         )
         # ordering in descending order by the F-test result,
         # following what the main article describes
 
         selected_features = []
-
-        for i in range(0, self.labels_count):
-            mask = sorted_temp_df["label_being_tested"] == i
-            split_df = sorted_temp_df[mask].reset_index(drop=True)
+        for i in range(0, labels_count):
+            mask = sorted_f_test_results["label_being_tested"] == i
+            split_df = sorted_f_test_results[mask].reset_index(drop=True)
 
             big_f = split_df["f_test_result"].sum()
             max_cum_f = self.alpha * big_f

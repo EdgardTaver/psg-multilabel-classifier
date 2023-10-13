@@ -7,10 +7,10 @@ import os
 
 def test_calculate_labels_correlation_with_f_test():
     train_data = load_dataset("scene", "train")
-    X_train, y_train, _, _ = train_data
+    _, y_train, _, _ = train_data
 
     ccf = CalculateLabelsCorrelationWithFTest(alpha=1)
-    res = ccf.fit(X_train, y_train)
+    res = ccf.get(y_train)
 
     f = os.path.join(
         "test_data", "expected_calculate_labels_correlation_with_f_test.csv"
