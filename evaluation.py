@@ -20,6 +20,11 @@ class EvaluationPipelineResult:
             self.cross_validate_result["test_hamming_loss"].std()
         ))
 
+        print("F1 score: {:.4f} ± {:.2f}".format(
+            self.cross_validate_result["test_f1"].mean(),
+            self.cross_validate_result["test_f1"].std()
+        ))
+
     def raw(self) -> Dict[Any, Any]:
         return self.cross_validate_result
 
@@ -37,10 +42,12 @@ class EvaluationPipeline:
         accuracy_scorer = metrics.make_scorer(metrics.accuracy_score)
         hamming_loss_scorer = metrics.make_scorer(
             metrics.hamming_loss, greater_is_better=False)
+        f1_scorer = metrics.make_scorer(metrics.f1_score, average="macro")
 
         scoring_set = {
             "accuracy": accuracy_scorer,
             "hamming_loss": hamming_loss_scorer,
+            "f1": f1_scorer,
         }
 
         validate_result = cross_validate(
