@@ -20,7 +20,7 @@ class DependantBinaryRelevance(MultiLabelClassifier):
     first_layer_classifiers: BinaryRelevance
     second_layer_classifiers: List[Any]
 
-    def __init__(self, classifier: Any, require_dense: Optional[List[bool]] = None):
+    def __init__(self, classifier: Any):
         super().__init__()
 
         self.first_base_classifier = copy.deepcopy(classifier)
