@@ -15,6 +15,57 @@ import copy
 
 from lib.types import MultiLabelClassifier
 
+class StackedGeneralization(MultiLabelClassifier):
+    first_layer_classifiers: BinaryRelevance
+    second_layer_classifiers: BinaryRelevance
+
+    def __init__(self, classifier: Any):
+        super().__init__()
+
+        first_base_classifier = copy.deepcopy(classifier)
+        second_base_classifier = copy.deepcopy(classifier)
+
+        self.first_layer_classifiers = BinaryRelevance(
+            classifier=first_base_classifier,
+            require_dense=[False, True]
+        )
+
+        self.second_layer_classifiers = BinaryRelevance(
+            classifier=second_base_classifier,
+            require_dense=[False, True]
+        )
+    
+    def fit(self, X: Any, y: Any):
+        print(f"FIT: X shape is {X.shape}")
+        self.first_layer_classifiers.fit(X, y)
+
+        first_layer_predictions = self.first_layer_classifiers.predict(X)
+        formatted_first_layer_predictions = first_layer_predictions.todense()
+        X_expanded = np.hstack([X.todense(), formatted_first_layer_predictions])
+
+        first_layer_sum = np.sum(np.sum(formatted_first_layer_predictions, axis=1))
+        print("FIT: summing the values (for first layer):", first_layer_sum)
+
+        print(f"FIT: X_extended shape is {X_expanded.shape}")
+        self.second_layer_classifiers.fit(X_expanded, y)
+    
+    def predict(self, X: Any) -> Any:
+        print(f"PREDICT: X shape is {X.shape}")
+        first_layer_predictions = self.first_layer_classifiers.predict(X)
+        formatted_first_layer_predictions = first_layer_predictions.todense()
+
+        X_expanded = np.hstack([X.todense(), formatted_first_layer_predictions])
+
+        print("PREDICT: summing the values (for first layer):", np.sum(np.sum(formatted_first_layer_predictions, axis=1)))
+        print(f"PREDICT: X_extended shape is {X_expanded.shape}")
+
+        second_layer_predictions = self.second_layer_classifiers.predict(X_expanded)
+        formatted_second_layer_predictions = second_layer_predictions.todense()
+
+        print("PREDICT: summing the values (for second layer):", np.sum(np.sum(formatted_second_layer_predictions, axis=1)))
+
+        return second_layer_predictions
+
 
 class DependantBinaryRelevance(MultiLabelClassifier):
     first_layer_classifiers: BinaryRelevance
