@@ -1,13 +1,18 @@
 import copy
-from typing import Any, Dict, List
+import math
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
+import pygad
+import sklearn.metrics as metrics
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import f_classif
-from skmultilearn.problem_transform import BinaryRelevance
+from sklearn.model_selection import train_test_split
+from skmultilearn.problem_transform import BinaryRelevance, ClassifierChain
 
 from lib.types import MultiLabelClassifier
+from lib.utils import has_duplicates, has_negatives
 
 
 class StackingWithFTests(MultiLabelClassifier):
@@ -168,3 +173,108 @@ class StackingWithFTests(MultiLabelClassifier):
 
         reshaped_array = np.asarray(second_layer_predictions).T
         return reshaped_array
+
+class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
+    def __init__(self, base_classifier: Any, num_generations: int = 5, random_state: Optional[int] = None) -> None:
+        self.base_classifier = base_classifier
+        self.num_generations = num_generations
+
+        if random_state is None:
+            self.random_state = np.random.randint(0, 1000)
+        else:
+            self.random_state = random_state
+    
+    def fit(self, X: Any, y: Any):
+        self.x = X
+        self.y = y
+        # this is the most practical way to pass the data to the fitness function
+
+        label_count = self.y.shape[1]
+        if label_count < 3:
+            raise Exception("label count is too low, we need at least 3 labels")
+
+        label_space = np.arange(label_count)
+        solutions_per_population = math.ceil(label_count / 2)
+        # to simplify the model, some heuristics are used
+
+        ga_model = pygad.GA( #type:ignore
+            gene_type=int,
+            gene_space=label_space,
+            random_seed=self.random_state,
+            save_best_solutions=False,
+            fitness_func=self.model_fitness_func,
+            allow_duplicate_genes=False, # very important, otherwise we will have duplicate labels in the ordering
+            num_genes=label_count,
+
+            # set up
+            num_generations=self.num_generations,
+            sol_per_pop=solutions_per_population,
+
+            # following what the article describes
+            keep_elitism=1, # also following what the article describes, but we have to double check [TODO]
+            parent_selection_type="rws", # following what the article describes
+            # mutation_probability=0.005, # following what the article describes
+
+            # the following settings are fixed
+            # they were chosen for no particular reason
+            # they are being kept as fixed to simplify the model
+            num_parents_mating=2,
+            crossover_type="scattered",
+            mutation_type="random",
+            mutation_by_replacement=True,
+            mutation_num_genes=1,
+        )
+
+        ga_model.run()
+
+        solution, _, _ = ga_model.best_solution()
+
+        best_classifier = ClassifierChain(
+            classifier=copy.deepcopy(self.base_classifier),
+            require_dense=[False, True],
+            order=solution,
+        )
+
+        best_classifier.fit(self.x, self.y)
+
+        self.best_classifier = best_classifier
+        
+    def model_fitness_func(self, ga_instance: Any, solution: Any, solution_idx: Any) -> float:
+        if has_duplicates(solution):
+            print("solutions contains duplicated values, skipping")
+            return 0
+        
+        if has_negatives(solution):
+            print("solutions contains negative values, skipping")
+            return 0
+
+        hamming_loss = self.test_ordering(solution)
+        hamming_loss = float(hamming_loss)
+        return 1/hamming_loss
+        # this will be the fitness function result, and we want to maximize it
+        # therefore, we have to return the inverse of the hamming loss
+    
+    def test_ordering(self, solution: List[int]):
+        print(f"testing order: {solution}")
+
+        classifier = ClassifierChain(
+            classifier=copy.deepcopy(self.base_classifier),
+            require_dense=[False, True],
+            order=solution,
+        )
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            self.x, self.y, test_size=0.2, random_state=self.random_state
+        )
+
+        classifier.fit(X_train, y_train)
+        preds = classifier.predict(X_test)
+
+        return metrics.hamming_loss(y_test, preds)
+
+
+    def predict(self, X: Any) -> Any:
+        if self.best_classifier is None:
+            raise Exception("model was not trained yet")
+
+        return self.best_classifier.predict(X)
