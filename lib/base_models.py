@@ -114,7 +114,7 @@ class DependantBinaryRelevance(MultiLabelClassifier):
         return np.asarray(matrix).reshape(-1)
 
     
-    def predict(self, X: Any): # type: ignore
+    def predict(self, X: Any) -> Any:
         if self.labels_count == 0:
             raise Exception("you must call `fit` before calling `predict`")
 
