@@ -163,15 +163,12 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
         ga_model.run()
 
         solution, _, _ = ga_model.best_solution()
-
         best_classifier = ClassifierChain(
-            classifier=copy.deepcopy(self.base_classifier),
-            require_dense=[False, True],
+            base_classifier=copy.deepcopy(self.base_classifier),
             order=solution,
         )
 
         best_classifier.fit(self.x, self.y)
-
         self.best_classifier = best_classifier
         
     def model_fitness_func(self, ga_instance: Any, solution: Any, solution_idx: Any) -> float:
@@ -193,8 +190,7 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
         print(f"testing order: {solution}")
 
         classifier = ClassifierChain(
-            classifier=copy.deepcopy(self.base_classifier),
-            require_dense=[False, True],
+            base_classifier=copy.deepcopy(self.base_classifier),
             order=solution,
         )
 

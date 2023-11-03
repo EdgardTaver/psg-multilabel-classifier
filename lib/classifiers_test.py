@@ -59,8 +59,8 @@ def test_classifier_chain_with_genetic_algorithm():
     hamming_loss = metrics.hamming_loss(y_test, predictions)
     f1_score = metrics.f1_score(y_test, predictions, average="macro")
 
-    assert hamming_loss == 0.283003300330033
-    assert f1_score == 0.4931912029405572
+    assert hamming_loss == 0.2004950495049505
+    assert f1_score == 0.6529424269090122
 
 def test_classifier_chain_with_lop():
     dataset_name = "scene"
