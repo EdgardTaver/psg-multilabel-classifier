@@ -13,8 +13,8 @@ from skmultilearn.problem_transform import BinaryRelevance
 
 from lib.types import MultiLabelClassifier, LOPMatrix
 from lib.utils import has_duplicates, has_negatives
-from lib.support import CalculateLabelsCorrelationWithFTest, ConditionalEntropies
-from lib.base_models import ClassifierChain
+from lib.support import CalculateLabelsCorrelationWithFTest, ConditionalEntropies, MutualInformation
+from lib.base_models import ClassifierChain, PartialClassifierChains
 
 
 class StackingWithFTests(MultiLabelClassifier):
@@ -218,7 +218,7 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
 class LOPSolver:
     def model_fitness_func(self, ga_instance: Any, solution: Any, solution_idx: Any) -> float:
         return self.test_solution(solution)
-        
+
     def test_solution(self, label_order: List[int]) -> float:
         if self.conditional_entropies is None:
             raise Exception("probabilities and entropies must be calculated before testing a solution")
@@ -315,6 +315,92 @@ class ClassifierChainWithLOP(MultiLabelClassifier, LOPSolver):
         best_classifier.fit(X, y)
         self.best_classifier = best_classifier
     
+    def predict(self, X: Any) -> Any:
+        if self.best_classifier is None:
+            raise Exception("model was not trained yet")
+
+        return self.best_classifier.predict(X)
+
+class PartialClassifierChainWithLOP(MultiLabelClassifier, LOPSolver):
+    def __init__(
+        self,
+        base_classifier: Any,
+        threshold: float = 0.01,
+        num_generations: int = 5,
+        random_state: Optional[int] = None
+    ) -> None:
+        self.base_classifier = base_classifier
+        self.threshold = threshold
+        self.num_generations = num_generations
+
+        if random_state is None:
+            self.random_state = np.random.randint(0, 1000)
+        else:
+            self.random_state = random_state
+
+        self.best_classifier = None
+        self.conditional_entropies = None
+        self.mutual_information = None
+        self.conditional_entropies_calculator = ConditionalEntropies()
+        self.mutual_information_calculator = MutualInformation()
+    
+    def fit(self, X: Any, y: Any):
+        self.conditional_entropies = self.conditional_entropies_calculator.calculate(y)
+        self.mutual_information = self.mutual_information_calculator.calculate(y)
+        
+        label_count = y.shape[1]
+        label_space = np.arange(label_count)
+
+        ga_model = pygad.GA( #type:ignore
+            gene_type=int,
+            gene_space=label_space,
+            random_seed=self.random_state,
+            save_best_solutions=False,
+            fitness_func=self.model_fitness_func,
+            allow_duplicate_genes=False, # very important, otherwise we will have duplicate labels in the ordering
+            num_genes=label_count,
+
+            # set up
+            num_generations=self.num_generations,
+
+            # following what the article describes
+            sol_per_pop=50,
+            keep_elitism=5,
+            parent_selection_type="rws",
+            num_parents_mating=2,
+            crossover_probability=0.9,
+            crossover_type="two_points",
+            mutation_type="swap",
+            mutation_probability=0.01,
+        )
+
+        ga_model.run()
+        
+        solution, _, _ = ga_model.best_solution()
+        partial_order = self.build_partial_orders(solution)
+
+        best_classifier = PartialClassifierChains(
+            base_classifier=copy.deepcopy(self.base_classifier),
+            order=solution,
+            partial_orders=partial_order
+        )
+
+        best_classifier.fit(X, y)
+        self.best_classifier = best_classifier
+    
+    def build_partial_orders(self, order: List[int]) -> Any:
+        labels_to_expand = {}
+        for pos_i in range(len(order)):
+            label_i = order[pos_i]
+            labels_to_expand[label_i] = []
+
+            for label_j in order[:pos_i]:
+                mi = self.mutual_information[label_i][label_j]
+                if mi > self.threshold:
+                    labels_to_expand[label_i].append(label_j)
+        
+        return labels_to_expand
+
     def predict(self, X: Any) -> Any:
         if self.best_classifier is None:
             raise Exception("model was not trained yet")
