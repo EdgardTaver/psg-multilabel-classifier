@@ -2,9 +2,12 @@ import copy
 from typing import Any, List
 
 import numpy as np
+import sklearn.metrics as metrics
+from sklearn.model_selection import train_test_split
 from skmultilearn.problem_transform import BinaryRelevance
 
 from lib.types import MultiLabelClassifier
+from lib.utils import has_duplicates
 
 
 class StackedGeneralization(MultiLabelClassifier):
@@ -141,4 +144,85 @@ class DependantBinaryRelevance(MultiLabelClassifier):
             second_layer_predictions.append(temp_preds)
 
         reshaped_array = np.asarray(second_layer_predictions).T
+        return reshaped_array
+
+class ClassifierChain:
+    """
+    Works just like the `ClassifierChain` class from `skmultilearn`, but ensures
+    that the output is in the same order as the labels in the dataset
+    regardless of the custom order of the classifiers
+    """
+
+    def __init__(self, base_classifier: Any, order: List[int]) -> None:
+        if has_duplicates(order):
+            raise Exception("the order must not contain duplicated values")
+
+        self.base_classifier = base_classifier
+        self.order = order
+    
+    def fit(self, X: Any, y: Any):
+        label_count = y.shape[1]
+        if label_count != len(self.order):
+            raise Exception("provided order does not match the label count")
+
+        self.classifiers = {}
+        # using a dict instead of a list as the index has to be the label following the custom order
+        # a list would also work, but it is more readable this way
+
+        self.metrics = []
+
+        X_extended = np.asarray(X.todense())
+        for label in self.order:
+            y_label = y[:, label].todense()
+
+            y_label_vector = np.asarray(y_label).reshape(-1)
+            # convert_matrix_to_vector
+
+            meta_classifier = copy.deepcopy(self.base_classifier)
+            meta_classifier.fit(X_extended, y_label_vector)
+            self.classifiers[label] = meta_classifier
+
+            X_extended = np.hstack([X_extended, y_label])
+            X_extended = np.asarray(X_extended)
+
+            # the following section gathers metrics throughout the training
+            # it has no impact in the actual model performance, but it might
+            # be interesting to study how to model behaves as it is being trained
+            metrics_X_train, metrics_X_test, metrics_y_train, metrics_y_test = train_test_split(
+                X_extended, y_label_vector, test_size=0.33, random_state=42
+            )
+
+            meta_classifier_for_metrics = copy.deepcopy(self.base_classifier)
+            meta_classifier_for_metrics.fit(metrics_X_train, metrics_y_train)
+            metrics_predictions = meta_classifier_for_metrics.predict(metrics_X_test)
+
+            hl = metrics.hamming_loss(metrics_y_test, metrics_predictions)
+            f1 = metrics.f1_score(metrics_y_test, metrics_predictions, average="macro")
+
+            self.metrics.append({
+                "training_for_label": label,
+                "hamming_loss": hl,
+                "f1_score": f1
+            })
+        
+    def predict(self, X: Any) -> Any:
+        X_extended = np.asarray(X.todense())
+
+        predicted_labels = {}
+        for label in self.order:
+            prediction = self.classifiers[label].predict(X_extended)
+            predicted_labels[label] = prediction
+            
+            reshaped_prediction = np.asarray(prediction).reshape(-1, 1)
+            X_extended = np.hstack([X_extended, reshaped_prediction])
+            X_extended = np.asarray(X_extended)
+        
+        predictions_in_original_label_order = []
+        original_label_order = np.arange(len(self.order))
+        for label in original_label_order:
+            predictions_in_original_label_order.append(predicted_labels[label])
+        # this is **very important**, otherwise the output of the model will not
+        # be comparable to the testing dataset 
+
+        reshaped_array = np.asarray(predictions_in_original_label_order).T
         return reshaped_array
