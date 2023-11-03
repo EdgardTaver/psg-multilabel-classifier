@@ -214,7 +214,49 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
 
         return self.best_classifier.predict(X)
 
-class ClassifierChainWithLOP():
+
+class LOPSolver:
+    def model_fitness_func(self, ga_instance: Any, solution: Any, solution_idx: Any) -> float:
+        return self.test_solution(solution)
+        
+    def test_solution(self, label_order: List[int]) -> float:
+        if self.conditional_entropies is None:
+            raise Exception("probabilities and entropies must be calculated before testing a solution")
+        
+        lop_matrix = self.build_lop_matrix(label_order)
+        return self.calculate_lop(lop_matrix)
+
+    def build_lop_matrix(self, label_order: List[int]) -> LOPMatrix:
+        if self.conditional_entropies is None:
+            raise Exception("probabilities and entropies must be calculated before testing a solution")
+
+        matrix = {}
+        for row_i in label_order:
+            matrix[row_i] = {}
+            for row_j in label_order:
+                conditional_entropy = self.conditional_entropies[row_i][row_j]
+                matrix[row_i][row_j] = conditional_entropy
+            
+        return matrix
+
+    def calculate_lop(self, lop_matrix: LOPMatrix) -> float:
+        matrix_size_n = len(lop_matrix)
+        lop_df = pd.DataFrame(lop_matrix)
+
+        upper_triangle_sum = 0
+        for row_position in range(matrix_size_n):
+            for column_position in range(matrix_size_n):
+                if column_position > row_position:
+                    conditional_probability = lop_df.iloc[row_position, column_position]
+                    upper_triangle_sum += cast(float, conditional_probability)
+                    # the conversion to a data frame is not necessary
+                    # but makes it easier to find the element we want
+                    # by their order in the rows or columns
+                    # instead of the actual column or row index
+        
+        return upper_triangle_sum
+
+class ClassifierChainWithLOP(MultiLabelClassifier, LOPSolver):
     def __init__(
         self,
         base_classifier: Any,
@@ -272,46 +314,6 @@ class ClassifierChainWithLOP():
 
         best_classifier.fit(X, y)
         self.best_classifier = best_classifier
-    
-    def model_fitness_func(self, ga_instance: Any, solution: Any, solution_idx: Any) -> float:
-        return self.test_solution(solution)
-
-    def test_solution(self, label_order: List[int]) -> float:
-        if self.conditional_entropies is None:
-            raise Exception("probabilities and entropies must be calculated before testing a solution")
-        
-        lop_matrix = self.build_lop_matrix(label_order)
-        return self.calculate_lop(lop_matrix)
-
-    def build_lop_matrix(self, label_order: List[int]) -> LOPMatrix:
-        if self.conditional_entropies is None:
-            raise Exception("probabilities and entropies must be calculated before testing a solution")
-
-        matrix = {}
-        for row_i in label_order:
-            matrix[row_i] = {}
-            for row_j in label_order:
-                conditional_entropy = self.conditional_entropies[row_i][row_j]
-                matrix[row_i][row_j] = conditional_entropy
-            
-        return matrix
-
-    def calculate_lop(self, lop_matrix: LOPMatrix) -> float:
-        matrix_size_n = len(lop_matrix)
-        lop_df = pd.DataFrame(lop_matrix)
-
-        upper_triangle_sum = 0
-        for row_position in range(matrix_size_n):
-            for column_position in range(matrix_size_n):
-                if column_position > row_position:
-                    conditional_probability = lop_df.iloc[row_position, column_position]
-                    upper_triangle_sum += cast(float, conditional_probability)
-                    # the conversion to a data frame is not necessary
-                    # but makes it easier to find the element we want
-                    # by their order in the rows or columns
-                    # instead of the actual column or row index
-        
-        return upper_triangle_sum
     
     def predict(self, X: Any) -> Any:
         if self.best_classifier is None:
