@@ -1,7 +1,8 @@
-from typing import Any
+from typing import Any, List
 
 import numpy as np
 import pandas as pd
+from pyitlib import discrete_random_variable as drv
 from sklearn.feature_selection import f_classif
 
 
@@ -94,3 +95,25 @@ class CalculateLabelsCorrelationWithFTest:
 
         cols = ["for_label", "expand_this_label", "f_test_result"]
         return pd.DataFrame(selected_features, columns=cols)
+
+
+class ConditionalEntropies:
+    def calculate(self, y: Any) -> List[List[float]]:
+        dense_y = y.todense()
+
+        label_count = dense_y.shape[1]
+
+        results = []
+        for label_x in range(label_count):
+            results.append([])
+            for label_y in range(label_count):
+                y_label_specific_x = np.asarray(dense_y[:, label_x]).reshape(-1)
+                y_label_specific_y = np.asarray(dense_y[:, label_y]).reshape(-1)
+                
+                conditional_entropy = drv.entropy_conditional(
+                    y_label_specific_x.tolist(),
+                    y_label_specific_y.tolist())
+                
+                results[label_x].append(float(conditional_entropy))
+        
+        return results
