@@ -3,6 +3,7 @@
         "arange",
         "classif",
         "hstack",
+        "iloc",
         "ndarray",
         "preds",
         "pygad",

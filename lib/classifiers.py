@@ -1,6 +1,6 @@
 import copy
 import math
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 import numpy as np
 import pandas as pd
@@ -9,11 +9,12 @@ import sklearn.metrics as metrics
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import f_classif
 from sklearn.model_selection import train_test_split
-from skmultilearn.problem_transform import BinaryRelevance, ClassifierChain
+from skmultilearn.problem_transform import BinaryRelevance
 
-from lib.types import MultiLabelClassifier
+from lib.types import MultiLabelClassifier, LOPMatrix
 from lib.utils import has_duplicates, has_negatives
-from lib.support import CalculateLabelsCorrelationWithFTest
+from lib.support import CalculateLabelsCorrelationWithFTest, ConditionalEntropies
+from lib.base_models import ClassifierChain
 
 
 class StackingWithFTests(MultiLabelClassifier):
@@ -207,6 +208,111 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
         return metrics.hamming_loss(y_test, preds)
 
 
+    def predict(self, X: Any) -> Any:
+        if self.best_classifier is None:
+            raise Exception("model was not trained yet")
+
+        return self.best_classifier.predict(X)
+
+class ClassifierChainWithLOP():
+    def __init__(
+        self,
+        base_classifier: Any,
+        num_generations: int = 5,
+        random_state: Optional[int] = None
+    ) -> None:
+        self.base_classifier = base_classifier
+        self.num_generations = num_generations
+
+        if random_state is None:
+            self.random_state = np.random.randint(0, 1000)
+        else:
+            self.random_state = random_state
+
+        self.conditional_entropies = None
+        self.best_classifier = None
+        self.conditional_entropies_calculator = ConditionalEntropies()
+    
+    def fit(self, X: Any, y: Any):
+        self.conditional_entropies = self.conditional_entropies_calculator.calculate(y)
+        
+        label_count = y.shape[1]
+        label_space = np.arange(label_count)
+
+        ga_model = pygad.GA( #type:ignore
+            gene_type=int,
+            gene_space=label_space,
+            random_seed=self.random_state,
+            save_best_solutions=False,
+            fitness_func=self.model_fitness_func,
+            allow_duplicate_genes=False, # very important, otherwise we will have duplicate labels in the ordering
+            num_genes=label_count,
+
+            # set up
+            num_generations=self.num_generations,
+
+            # following what the article describes
+            sol_per_pop=50,
+            keep_elitism=5,
+            parent_selection_type="rws",
+            num_parents_mating=2,
+            crossover_probability=0.9,
+            crossover_type="two_points",
+            mutation_type="swap",
+            mutation_probability=0.01,
+        )
+
+        ga_model.run()
+
+        solution, _, _ = ga_model.best_solution()
+        best_classifier = ClassifierChain(
+            base_classifier=copy.deepcopy(self.base_classifier),
+            order=solution,
+        )
+
+        best_classifier.fit(X, y)
+        self.best_classifier = best_classifier
+    
+    def model_fitness_func(self, ga_instance: Any, solution: Any, solution_idx: Any) -> float:
+        return self.test_solution(solution)
+
+    def test_solution(self, label_order: List[int]) -> float:
+        if self.conditional_entropies is None:
+            raise Exception("probabilities and entropies must be calculated before testing a solution")
+        
+        lop_matrix = self.build_lop_matrix(label_order)
+        return self.calculate_lop(lop_matrix)
+
+    def build_lop_matrix(self, label_order: List[int]) -> LOPMatrix:
+        if self.conditional_entropies is None:
+            raise Exception("probabilities and entropies must be calculated before testing a solution")
+
+        matrix = {}
+        for row_i in label_order:
+            matrix[row_i] = {}
+            for row_j in label_order:
+                conditional_entropy = self.conditional_entropies[row_i][row_j]
+                matrix[row_i][row_j] = conditional_entropy
+            
+        return matrix
+
+    def calculate_lop(self, lop_matrix: LOPMatrix) -> float:
+        matrix_size_n = len(lop_matrix)
+        lop_df = pd.DataFrame(lop_matrix)
+
+        upper_triangle_sum = 0
+        for row_position in range(matrix_size_n):
+            for column_position in range(matrix_size_n):
+                if column_position > row_position:
+                    conditional_probability = lop_df.iloc[row_position, column_position]
+                    upper_triangle_sum += cast(float, conditional_probability)
+                    # the conversion to a data frame is not necessary
+                    # but makes it easier to find the element we want
+                    # by their order in the rows or columns
+                    # instead of the actual column or row index
+        
+        return upper_triangle_sum
+    
     def predict(self, X: Any) -> Any:
         if self.best_classifier is None:
             raise Exception("model was not trained yet")

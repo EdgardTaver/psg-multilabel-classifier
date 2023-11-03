@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Dict
 
 from skmultilearn.base.problem_transformation import ProblemTransformationBase
+
+LOPMatrix = Dict[int, Dict[int, float]]
 
 class MultiLabelClassifier(ABC, ProblemTransformationBase):
     @abstractmethod
