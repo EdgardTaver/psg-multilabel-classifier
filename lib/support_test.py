@@ -1,8 +1,10 @@
-from skmultilearn.dataset import load_dataset
-from support import CalculateLabelsCorrelationWithFTest
-import pandas as pd
-from helper import expect_data_frames_to_be_equal
 import os
+
+import pandas as pd
+from skmultilearn.dataset import load_dataset
+
+from lib.helper import expect_data_frames_to_be_equal
+from lib.support import CalculateLabelsCorrelationWithFTest
 
 
 def test_calculate_labels_correlation_with_f_test():
