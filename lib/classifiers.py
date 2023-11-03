@@ -129,8 +129,12 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
             raise Exception("label count is too low, we need at least 3 labels")
 
         label_space = np.arange(label_count)
+
         solutions_per_population = math.ceil(label_count / 2)
         # to simplify the model, some heuristics are used
+        # also, it becomes too computationally expensive to try all possible combinations
+        # the original paper, which inspires but does not describes this model
+        # proposes 50 solutions per population
 
         ga_model = pygad.GA( #type:ignore
             gene_type=int,
@@ -146,18 +150,13 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
             sol_per_pop=solutions_per_population,
 
             # following what the article describes
-            keep_elitism=1, # also following what the article describes, but we have to double check [TODO]
-            parent_selection_type="rws", # following what the article describes
-            # mutation_probability=0.005, # following what the article describes
-
-            # the following settings are fixed
-            # they were chosen for no particular reason
-            # they are being kept as fixed to simplify the model
+            keep_elitism=1,
+            parent_selection_type="rws",
             num_parents_mating=2,
-            crossover_type="scattered",
-            mutation_type="random",
-            mutation_by_replacement=True,
-            mutation_num_genes=1,
+            crossover_probability=0.9,
+            crossover_type="two_points",
+            mutation_type="swap",
+            mutation_probability=0.01,
         )
 
         ga_model.run()
