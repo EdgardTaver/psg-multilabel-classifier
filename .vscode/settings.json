@@ -4,6 +4,8 @@
         "hstack",
         "ndarray",
         "preds",
+        "pygad",
+        "skmultilearn",
         "todense"
     ],
     "[python]": {
