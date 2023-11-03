@@ -117,3 +117,19 @@ class ConditionalEntropies:
                 results[label_x].append(float(conditional_entropy))
         
         return results
+
+class MutualInformation:
+    def calculate(self, y: Any) -> List[List[float]]:
+        dense_y = y.todense()
+
+        results = []
+        for label_x in range(dense_y.shape[1]):
+            results.append([])
+            for label_y in range(dense_y.shape[1]):
+                y_label_specific_x = np.asarray(dense_y[:, label_x]).reshape(-1)
+                y_label_specific_y = np.asarray(dense_y[:, label_y]).reshape(-1)
+                
+                e = drv.information_mutual(y_label_specific_x.tolist(), y_label_specific_y.tolist())
+                results[label_x].append(e)
+
+        return results
