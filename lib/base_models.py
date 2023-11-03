@@ -1,7 +1,8 @@
 import copy
-from typing import Any, List
+from typing import Any, Dict, List
 
 import numpy as np
+import pandas as pd
 import sklearn.metrics as metrics
 from sklearn.model_selection import train_test_split
 from skmultilearn.problem_transform import BinaryRelevance
@@ -216,6 +217,97 @@ class ClassifierChain:
             reshaped_prediction = np.asarray(prediction).reshape(-1, 1)
             X_extended = np.hstack([X_extended, reshaped_prediction])
             X_extended = np.asarray(X_extended)
+        
+        predictions_in_original_label_order = []
+        original_label_order = np.arange(len(self.order))
+        for label in original_label_order:
+            predictions_in_original_label_order.append(predicted_labels[label])
+        # this is **very important**, otherwise the output of the model will not
+        # be comparable to the testing dataset 
+
+        reshaped_array = np.asarray(predictions_in_original_label_order).T
+        return reshaped_array
+
+class PartialClassifierChains:
+    """
+    Allows for partial orders to be used in the classifier chain.
+    """
+
+    def __init__(
+        self,
+        base_classifier: Any,
+        order: List[int],
+        partial_orders: Dict[int, List[int]]
+    ) -> None:
+        if has_duplicates(order):
+            raise Exception("the order must not contain duplicated values")
+
+        self.base_classifier = base_classifier
+        self.order = order
+        self.partial_orders = partial_orders
+    
+    def fit(self, X: Any, y: Any):
+        label_count = y.shape[1]
+        if label_count != len(self.order):
+            raise Exception("provided order does not match the label count")
+
+        self.classifiers = {}
+        # using a dict instead of a list as the index has to be the label following the custom order
+        # a list would also work, but it is more readable this way
+
+        self.metrics = []
+        label_values_obtained = {}
+        
+        for label in self.order:
+            y_label = y[:, label].todense()
+            y_label_vector = np.asarray(y_label).reshape(-1)
+            # convert_matrix_to_vector
+
+            X_local_extended = X.todense()
+            partial_order = self.partial_orders[label]
+            if len(partial_order) > 0:
+                labels_to_expand = pd.DataFrame(label_values_obtained).loc[:, partial_order].values
+                X_local_extended = np.hstack([X.todense(), labels_to_expand])
+
+            X_local_extended = np.asarray(X_local_extended)
+
+            meta_classifier = copy.deepcopy(self.base_classifier)
+            meta_classifier.fit(X_local_extended, y_label_vector)
+            self.classifiers[label] = meta_classifier
+            label_values_obtained[label] = y_label_vector
+
+            # the following section gathers metrics throughout the training
+            # it has no impact in the actual model performance, but it might
+            # be interesting to study how to model behaves as it is being trained
+            metrics_X_train, metrics_X_test, metrics_y_train, metrics_y_test = train_test_split(
+                X_local_extended, y_label_vector, test_size=0.33, random_state=42
+            )
+
+            meta_classifier_for_metrics = copy.deepcopy(self.base_classifier)
+            meta_classifier_for_metrics.fit(metrics_X_train, metrics_y_train)
+            metrics_predictions = meta_classifier_for_metrics.predict(metrics_X_test)
+
+            hl = metrics.hamming_loss(metrics_y_test, metrics_predictions)
+            f1 = metrics.f1_score(metrics_y_test, metrics_predictions, average="macro")
+
+            self.metrics.append({
+                "training_for_label": label,
+                "hamming_loss": hl,
+                "f1_score": f1
+            })
+        
+    def predict(self, X: Any) -> Any:
+        predicted_labels = {}
+        for label in self.order:
+            partial_order = self.partial_orders[label]
+            X_local_extended = np.asarray(X.todense())
+            if len(partial_order) > 0:
+                labels_to_expand = pd.DataFrame(predicted_labels).loc[:, partial_order].values
+                X_local_extended = np.hstack([X.todense(), labels_to_expand])
+            
+            X_local_extended = np.asarray(X_local_extended)
+            prediction = self.classifiers[label].predict(X_local_extended)
+            predicted_labels[label] = prediction
         
         predictions_in_original_label_order = []
         original_label_order = np.arange(len(self.order))
