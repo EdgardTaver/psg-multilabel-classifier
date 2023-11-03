@@ -13,6 +13,7 @@ from skmultilearn.problem_transform import BinaryRelevance, ClassifierChain
 
 from lib.types import MultiLabelClassifier
 from lib.utils import has_duplicates, has_negatives
+from lib.support import CalculateLabelsCorrelationWithFTest
 
 
 class StackingWithFTests(MultiLabelClassifier):
@@ -35,7 +36,6 @@ class StackingWithFTests(MultiLabelClassifier):
             raise Exception("alpha must be >= 0.0 and <= 1.0")
 
         self.base_classifier = classifier
-
         self.alpha = alpha
         self.use_first_layer_to_calculate_correlations = use_first_layer_to_calculate_correlations
         
@@ -48,6 +48,8 @@ class StackingWithFTests(MultiLabelClassifier):
         self.correlated_labels_map = pd.DataFrame()
         self.labels_count = 0
 
+        self.ccf = CalculateLabelsCorrelationWithFTest(alpha=alpha)
+
 
     def fit(self, X: Any, y: Any):
         self.labels_count = y.shape[1]
@@ -58,22 +60,19 @@ class StackingWithFTests(MultiLabelClassifier):
         if self.use_first_layer_to_calculate_correlations:
             label_classifications = self.first_layer_classifiers.predict(X)
 
-        f_tested_label_pairs = self.calculate_f_test_for_all_label_pairs(label_classifications)
-        self.correlated_labels_map = self.get_map_of_correlated_labels(f_tested_label_pairs)
-
+        self.correlated_labels_map = self.ccf.get(label_classifications)
         for i in range(self.labels_count):
             mask = self.correlated_labels_map["for_label"] == i
             split_df = self.correlated_labels_map[mask].reset_index(drop=True)
             labels_to_expand = split_df["expand_this_label"].to_list()
-
             labels_to_expand.sort()
+            # some base classifiers, such as random forest, may be slightly influenced
+            # by the order of the features
+            # so we sort the labels to expand, to make sure the order is always the same
 
             additional_input = label_classifications.todense()[:, labels_to_expand]
-            
             X_expanded = np.hstack([X.todense(), additional_input])
             X_expanded = np.asarray(X_expanded)
-
-            print(f"FIT: X_extended shape, for label {i}, is {X_expanded.shape}")
 
             y_label_specific = y.todense()[:, i]
             y_label_specific = self.convert_matrix_to_vector(y_label_specific)
@@ -82,70 +81,9 @@ class StackingWithFTests(MultiLabelClassifier):
             meta_classifier.fit(X_expanded, y_label_specific)
 
             self.second_layer_classifiers.append(meta_classifier)
-            print(f"finished training meta classifier for label {i}")
-    
-    def calculate_f_test_for_all_label_pairs(self, label_classifications: Any) -> List[Dict[str, Any]]:
-        results = []
-
-        for i in range(0, self.labels_count):
-            for j in range(0, self.labels_count):
-                if i == j:
-                    continue
-
-                X = label_classifications.todense()[:, i]
-                base_label = self.convert_matrix_to_array(X)
-
-                y = label_classifications.todense()[:, j]
-                against_label = self.convert_matrix_to_vector(y)
-
-                f_test_result = f_classif(base_label, against_label)[0]
-
-                results.append({
-                    "label_being_tested": i,
-                    "against_label": j,
-                    "f_test_result": float(f_test_result)
-                })
-        
-        return results
-    
-    def convert_matrix_to_array(self, matrix: Any):
-        return np.asarray(matrix).reshape(-1, 1)
 
     def convert_matrix_to_vector(self, matrix: Any):
         return np.asarray(matrix).reshape(-1)
-    
-    def get_map_of_correlated_labels(self, f_test_results: List[Dict[str, Any]]) -> pd.DataFrame:
-        temp_df = pd.DataFrame(f_test_results)
-        
-        sorted_temp_df = temp_df.sort_values(
-            by=["label_being_tested", "f_test_result"],
-            ascending=[True, False])
-        # ordering in descending order by the F-test result,
-        # following what the main article describes
-
-        selected_features = []
-
-        for i in range(self.labels_count):
-            mask = sorted_temp_df["label_being_tested"] == i
-            split_df = sorted_temp_df[mask].reset_index(drop=True)
-
-            big_f = split_df["f_test_result"].sum()
-            max_cum_f = self.alpha * big_f
-
-            cum_f = 0
-            for _, row in split_df.iterrows():
-                cum_f += row["f_test_result"]
-                if cum_f > max_cum_f:
-                    break
-
-                selected_features.append({
-                    "for_label": i,
-                    "expand_this_label": int(row["against_label"]),
-                    "f_test_result": float(row["f_test_result"]),
-                })
-        
-        cols = ["for_label", "expand_this_label", "f_test_result"]
-        return pd.DataFrame(selected_features, columns=cols)
     
     def predict(self, X: Any) -> np.ndarray[Any,Any]:
         if self.correlated_labels_map.columns.size == 0:
@@ -158,21 +96,18 @@ class StackingWithFTests(MultiLabelClassifier):
             mask = self.correlated_labels_map["for_label"] == i
             split_df = self.correlated_labels_map[mask].reset_index(drop=True)
             labels_to_expand = split_df["expand_this_label"].to_list()
-
             labels_to_expand.sort()
 
             additional_input = predictions.todense()[:, labels_to_expand]
-
             X_expanded = np.hstack([X.todense(), additional_input])
             X_expanded = np.asarray(X_expanded)
 
-            print(f"PREDICT: X_extended shape, for label {i}, is {X_expanded.shape}")
-
-            temp_preds = self.second_layer_classifiers[i].predict(X_expanded)
-            second_layer_predictions.append(temp_preds)
+            predictions_for_label = self.second_layer_classifiers[i].predict(X_expanded)
+            second_layer_predictions.append(predictions_for_label)
 
         reshaped_array = np.asarray(second_layer_predictions).T
         return reshaped_array
+
 
 class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
     def __init__(self, base_classifier: Any, num_generations: int = 5, random_state: Optional[int] = None) -> None:
