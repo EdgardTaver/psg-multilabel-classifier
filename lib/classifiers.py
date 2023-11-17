@@ -16,6 +16,7 @@ from lib.support import (
     CalculateLabelsCorrelationWithFTest,
     ConditionalEntropies,
     MutualInformation,
+    build_chain_based_on_f_test,
 )
 from lib.base_models import ClassifierChain, PartialClassifierChains
 
@@ -111,6 +112,42 @@ class StackingWithFTests(MultiLabelClassifier):
 
         reshaped_array = np.asarray(second_layer_predictions).T
         return reshaped_array
+    
+class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
+    def __init__(
+        self,
+        alpha: float = 0.5,
+        base_classifier: Any,
+    ):
+        super().__init__()
+
+        self.main_classifier = None
+        self.copyable_attrs = ["base_classifier", "alpha"]
+        # NOTE: this `copyable_attrs` must match exactly the arguments passed to the constructor
+        
+        self.alpha = alpha
+        self.base_classifier = base_classifier
+
+        self.calculator = CalculateLabelsCorrelationWithFTest(alpha=self.alpha)
+    
+    def fit(self, X: Any, y: Any):
+        self.classes_ = np.arange(y.shape[1])
+        # NOTE: this is required to run the evaluation pipeline
+        
+        f_test_ordering = build_chain_based_on_f_test(self.calculator.get(y))
+        
+        self.main_classifier = ClassifierChain(
+            base_classifier=self.base_classifier,
+            order=f_test_ordering,
+        )
+
+        self.main_classifier.fit(X, y)
+    
+    def predict(self, X: Any):
+        if self.main_classifier is None:
+            raise Exception("model was not trained yet")
+
+        return self.main_classifier.predict(X)
 
 
 class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
