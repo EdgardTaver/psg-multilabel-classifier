@@ -116,8 +116,7 @@ class StackingWithFTests(MultiLabelClassifier):
 class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
     def __init__(
         self,
-        alpha: float = 0.5,
-        base_classifier: Any,
+        base_classifier: Any = RandomForestClassifier(),
     ):
         super().__init__()
 
@@ -125,17 +124,16 @@ class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
         self.copyable_attrs = ["base_classifier", "alpha"]
         # NOTE: this `copyable_attrs` must match exactly the arguments passed to the constructor
         
-        self.alpha = alpha
         self.base_classifier = base_classifier
-
-        self.calculator = CalculateLabelsCorrelationWithFTest(alpha=self.alpha)
+        self.calculator = CalculateLabelsCorrelationWithFTest(alpha=1)
+        # alpha=1 because we need to get a full chain ordering
+        # therefore we need all the labels
     
     def fit(self, X: Any, y: Any):
         self.classes_ = np.arange(y.shape[1])
         # NOTE: this is required to run the evaluation pipeline
         
-        f_test_ordering = build_chain_based_on_f_test(self.calculator.get(y))
-        
+        f_test_ordering = build_chain_based_on_f_test(self.calculator.get(y))        
         self.main_classifier = ClassifierChain(
             base_classifier=self.base_classifier,
             order=f_test_ordering,
