@@ -10,16 +10,15 @@ from lib.classifiers import (ClassifierChainWithFTestOrdering,
 
 def test_stacking_with_f_tests():
     dataset_name = "scene"
+    
     train_dataset = load_dataset(dataset_name, "train")
     if train_dataset is None:
         raise Exception("could not load dataset")
-
     X_train, y_train, _, _ = train_dataset
 
     test_dataset = load_dataset(dataset_name, "test")
     if test_dataset is None:
         raise Exception("could not load dataset")
-
     X_test, y_test, _, _ = test_dataset
 
     model = StackingWithFTests(
@@ -62,16 +61,15 @@ def test_classifier_chain_with_f_test_ordering():
 
 def test_classifier_chain_with_genetic_algorithm():
     dataset_name = "emotions"
+    
     train_dataset = load_dataset(dataset_name, "train")
     if train_dataset is None:
         raise Exception("could not load dataset")
-
     X_train, y_train, _, _ = train_dataset
 
     test_dataset = load_dataset(dataset_name, "test")
     if test_dataset is None:
         raise Exception("could not load dataset")
-
     X_test, y_test, _, _ = test_dataset
 
     model = ClassifierChainWithGeneticAlgorithm(
@@ -90,16 +88,15 @@ def test_classifier_chain_with_genetic_algorithm():
 
 def test_classifier_chain_with_lop():
     dataset_name = "scene"
+    
     train_dataset = load_dataset(dataset_name, "train")
     if train_dataset is None:
         raise Exception("could not load dataset")
-
     X_train, y_train, _, _ = train_dataset
 
     test_dataset = load_dataset(dataset_name, "test")
     if test_dataset is None:
         raise Exception("could not load dataset")
-
     X_test, y_test, _, _ = test_dataset
 
     model = ClassifierChainWithLOP(
@@ -121,16 +118,15 @@ def test_classifier_chain_with_lop():
 
 def test_partial_classifier_chain_with_lop():
     dataset_name = "scene"
+    
     train_dataset = load_dataset(dataset_name, "train")
     if train_dataset is None:
         raise Exception("could not load dataset")
-
     X_train, y_train, _, _ = train_dataset
 
     test_dataset = load_dataset(dataset_name, "test")
     if test_dataset is None:
         raise Exception("could not load dataset")
-
     X_test, y_test, _, _ = test_dataset
 
     model = PartialClassifierChainWithLOP(

@@ -40,7 +40,7 @@ class StackingWithFTests(MultiLabelClassifier):
         if alpha < 0.0 or alpha > 1.0:
             raise Exception("alpha must be >= 0.0 and <= 1.0")
 
-        self.base_classifier = classifier
+        self.base_classifier = base_classifier
         self.alpha = alpha
         self.use_first_layer_to_calculate_correlations = (
             use_first_layer_to_calculate_correlations
