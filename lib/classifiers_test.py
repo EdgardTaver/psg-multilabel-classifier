@@ -24,8 +24,8 @@ def test_stacking_with_f_tests():
 
     model = StackingWithFTests(
         alpha=0.5,
-        classifier=RandomForestClassifier(random_state=42)
-    ) # TODO: for standardization, use `base_classifier`
+        base_classifier=RandomForestClassifier(random_state=42)
+    )
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
 

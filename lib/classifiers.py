@@ -33,7 +33,7 @@ class StackingWithFTests(MultiLabelClassifier):
         self,
         alpha: float = 0.5,
         use_first_layer_to_calculate_correlations: bool = False,
-        classifier: Any = RandomForestClassifier(),
+        base_classifier: Any = RandomForestClassifier(),
     ):
         super().__init__()
 
