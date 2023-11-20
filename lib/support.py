@@ -135,14 +135,6 @@ class MutualInformation:
         return results
 
 
-def build_descending_chain_based_on_f_test(f_test_results: pd.DataFrame) -> List[int]:    
-    return build_chain_based_on_f_test(f_test_results, False)
-
-
-def build_ascending_chain_based_on_f_test(f_test_results: pd.DataFrame) -> List[int]:
-    return build_chain_based_on_f_test(f_test_results, True)
-
-
 def build_chain_based_on_f_test(f_test_results: pd.DataFrame, ascending_chain: bool) -> List[int]:
     chain = []
     sorted_res = f_test_results.sort_values(by=["f_test_result"], ascending=ascending_chain)
