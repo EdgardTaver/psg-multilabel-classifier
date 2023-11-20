@@ -10,6 +10,9 @@ from skmultilearn.dataset import load_dataset
 import logging
 
 class MetricsPipeline:
+    def __init__(self, repository: "MetricsPipelineRepository"):
+        self.repository = repository
+
     def run(self):
         # TODO: should be able to get info about each dataset
         # - rows; -labels
@@ -69,11 +72,8 @@ class MetricsPipeline:
 
         logging.info("will start getting metrics for all the models")
 
-        evaluation_results = {}
         for model_name, model in models.items():
             logging.info(f"# running model `{model_name}`")
-
-            evaluation_results[model_name] = {}
 
             n_folds = 2
             evaluation_pipeline = EvaluationPipeline(model, n_folds)
@@ -81,19 +81,22 @@ class MetricsPipeline:
             for dataset_name, info in datasets.items():
                 logging.info(f"## running dataset `{dataset_name}`")
 
+                if self.repository.result_already_exists(model_name, dataset_name):
+                    logging.warn(f"## dataset `{dataset_name}` was already evaluated for model `{model_name}`")
+                    continue
+
                 result = evaluation_pipeline.run(info["X"], info["y"])
-                evaluation_results[model_name][dataset_name] = result
+                self.repository.add_result(model_name, dataset_name, result)
 
                 logging.info(f"results obtained:")
                 result.describe()
         
-        logging.info(evaluation_results)
-        logging.info(evaluation_results["baseline_binary_relevance_model"]["scene"].raw())
+        logging.info("finished getting metrics for all the models")
 
 
 
 
-class MetricsPipelineResults:
+class MetricsPipelineRepository:
     """
     Wrapper for `RawEvaluationResults` with additional functionality.
     """
@@ -118,13 +121,16 @@ class MetricsPipelineResults:
         df.to_csv(path, index=False)
 
     def add_result(self, model_name: str, dataset_name: str, result: EvaluationPipelineResult) -> None:
+        if model_name not in self.raw_evaluation_results:
+            self.raw_evaluation_results[model_name] = {}
+        
         self.raw_evaluation_results[model_name][dataset_name] = result
-
-
-
-"""
-Notes during development:
-
-* The `evaluation_result` already has the metrics for each fold.
-    * So we only need to translate that result to a flat table and then save it somewhere.
-"""
+    
+    def result_already_exists(self, model_name: str, dataset_name: str) -> bool:
+        if model_name not in self.raw_evaluation_results:
+            return False
+        
+        if dataset_name not in self.raw_evaluation_results[model_name]:
+            return False
+        
+        return True

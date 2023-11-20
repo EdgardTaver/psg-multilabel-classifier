@@ -1,4 +1,4 @@
-from metrics.pipeline import MetricsPipeline, MetricsPipelineResults
+from metrics.pipeline import MetricsPipeline, MetricsPipelineRepository
 import logging
 
 def setup_logging() -> None:
@@ -11,8 +11,13 @@ PIPELINE_RESULTS_FILE = "./data/metrics.csv"
 if __name__ == "__main__":
     setup_logging()
 
-    a = MetricsPipelineResults()
+    a = MetricsPipelineRepository()
     a.load_from_file(PIPELINE_RESULTS_FILE)
 
     print(a.raw_evaluation_results)
+
+    b = MetricsPipeline(a)
+    b.run()
+
+    a.save_to_file(PIPELINE_RESULTS_FILE)
     
