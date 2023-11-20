@@ -11,7 +11,6 @@ class EvaluationPipeline:
     n_folds: int
 
     def __init__(self, model: Any, n_folds: int = 5) -> None:
-        # TODO: establish the model type
         self.model = model
         self.n_folds = n_folds
 
@@ -19,7 +18,7 @@ class EvaluationPipeline:
         accuracy_scorer = metrics.make_scorer(metrics.accuracy_score)
         hamming_loss_scorer = metrics.make_scorer(
             metrics.hamming_loss, greater_is_better=False)
-        f1_scorer = metrics.make_scorer(metrics.f1_score, average="macro")
+        f1_scorer = metrics.make_scorer(metrics.f1_score, average="macro", zero_division=0)
 
         scoring_set = {
             "accuracy": accuracy_scorer,

@@ -18,7 +18,7 @@ if __name__ == "__main__":
     setup_logging()
 
     repository = MetricsPipelineRepository(PIPELINE_RESULTS_FILE)
-    loader = DatasetsLoader(["scene"])
+    loader = DatasetsLoader(["birds"])
 
     models = {
         "baseline_binary_relevance_model": BinaryRelevance(

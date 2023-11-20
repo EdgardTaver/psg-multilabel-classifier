@@ -138,7 +138,8 @@ class MetricsPipelineRepository:
             raise Exception("only CSV files are supported")
     
         if not os.path.exists(self.csv_file_path):
-            raise Exception("file does not exist")
+            logging.warn(f"file does not exist, creating new one: {self.csv_file_path}")
+            return
 
         df = pd.read_csv(self.csv_file_path)
         self.raw_evaluation_results = flat_table_to_evaluation_results(df)
