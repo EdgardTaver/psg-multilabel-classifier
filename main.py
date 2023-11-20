@@ -17,13 +17,8 @@ PIPELINE_RESULTS_FILE = "./data/metrics.csv"
 if __name__ == "__main__":
     setup_logging()
 
-    repository = MetricsPipelineRepository()
-    repository.load_from_file(PIPELINE_RESULTS_FILE)
-
+    repository = MetricsPipelineRepository(PIPELINE_RESULTS_FILE)
     loader = DatasetsLoader(["scene"])
-    loader.load()
-    loader.describe()
-
     models = {
         "baseline_binary_relevance_model": BinaryRelevance(
            classifier=SVC(),
@@ -33,5 +28,3 @@ if __name__ == "__main__":
 
     pipe = MetricsPipeline(repository, loader, models)
     pipe.run()
-
-    repository.save_to_file(PIPELINE_RESULTS_FILE)

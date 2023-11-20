@@ -25,6 +25,9 @@ class MetricsPipeline:
     def run(self):
         logging.info("pipeline: getting metrics for all the models")
 
+        self.repository.load_from_file()
+        self.datasets_loader.load()
+        
         datasets = self.datasets_loader.get()
         
         total_datasets = len(datasets)
@@ -56,6 +59,7 @@ class MetricsPipeline:
 
                 result = evaluation_pipeline.run(info["X"], info["y"])
                 self.repository.add_result(model_name, dataset_name, result)
+                self.repository.save_to_file()
 
                 logging.info(f"evaluation finished | {log_fields}")
         
@@ -118,7 +122,6 @@ class DatasetsLoader:
             logging.info(f"information for dataset: {structured_log}")
 
 
-
 class MetricsPipelineRepository:
     """
     Wrapper for `RawEvaluationResults` with additional functionality.
@@ -126,22 +129,23 @@ class MetricsPipelineRepository:
 
     raw_evaluation_results: RawEvaluationResults
 
-    def __init__(self) -> None:
+    def __init__(self, csv_file_path: str) -> None:
+        self.csv_file_path = csv_file_path
         self.raw_evaluation_results = {}
     
-    def load_from_file(self, path:str) -> None:
-        if not path.endswith(".csv"):
+    def load_from_file(self) -> None:
+        if not self.csv_file_path.endswith(".csv"):
             raise Exception("only CSV files are supported")
     
-        if not os.path.exists(path):
+        if not os.path.exists(self.csv_file_path):
             raise Exception("file does not exist")
 
-        df = pd.read_csv(path)
+        df = pd.read_csv(self.csv_file_path)
         self.raw_evaluation_results = flat_table_to_evaluation_results(df)
     
-    def save_to_file(self, path:str) -> None:
+    def save_to_file(self) -> None:
         df = evaluation_results_to_flat_table(self.raw_evaluation_results)
-        df.to_csv(path, index=False)
+        df.to_csv(self.csv_file_path, index=False)
 
     def add_result(self, model_name: str, dataset_name: str, result: EvaluationPipelineResult) -> None:
         if model_name not in self.raw_evaluation_results:
