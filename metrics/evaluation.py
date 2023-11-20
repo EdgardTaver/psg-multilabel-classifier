@@ -1,7 +1,9 @@
-from sklearn.model_selection import cross_validate
-import sklearn.metrics as metrics
-from typing import Any, Dict
+from typing import Any
 
+import sklearn.metrics as metrics
+from sklearn.model_selection import cross_validate
+
+from metrics.types import EvaluationPipelineResult
 
 
 class EvaluationPipeline:
@@ -33,29 +35,3 @@ class EvaluationPipeline:
             return_train_score=True)
 
         return EvaluationPipelineResult(validate_result)
-
-
-class EvaluationPipelineResult:
-    cross_validated_results: Dict[Any, Any]
-
-    def __init__(self, cross_validate_result: Dict[Any, Any]) -> None:
-        self.cross_validated_results = cross_validate_result
-
-    def describe(self) -> None:
-        print("Accuracy: {:.4f} ± {:.2f}".format(
-            self.cross_validated_results["test_accuracy"].mean(),
-            self.cross_validated_results["test_accuracy"].std()
-        ))
-
-        print("Hamming Loss: {:.4f} ± {:.2f}".format(
-            self.cross_validated_results["test_hamming_loss"].mean(),
-            self.cross_validated_results["test_hamming_loss"].std()
-        ))
-
-        print("F1 score: {:.4f} ± {:.2f}".format(
-            self.cross_validated_results["test_f1"].mean(),
-            self.cross_validated_results["test_f1"].std()
-        ))
-
-    def raw(self) -> Dict[Any, Any]:
-        return self.cross_validated_results

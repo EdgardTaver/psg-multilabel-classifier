@@ -1,7 +1,5 @@
-from typing import Dict
-
-import pandas as pd
-from lib.evaluation import EvaluationPipeline, EvaluationPipelineResult
+from metrics.evaluation import EvaluationPipeline, EvaluationPipelineResult
+from metrics.types import RawEvaluationResults
 from sklearn.svm import SVC
 from skmultilearn.problem_transform import BinaryRelevance
 from skmultilearn.dataset import load_dataset
@@ -109,9 +107,7 @@ class EvaluationResults:
 
     pass
 
-def evaluation_results_to_flat_table(evaluation_results: RawEvaluationResults) -> pd.DataFrame:
-    flat_table = pd.DataFrame()
-    return flat_table
+
 
 
 """
