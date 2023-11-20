@@ -1,5 +1,11 @@
-from metrics.pipeline import MetricsPipeline, MetricsPipelineRepository, DatasetsLoader
 import logging
+
+from sklearn.svm import SVC
+from skmultilearn.problem_transform import BinaryRelevance
+
+from metrics.pipeline import (DatasetsLoader, MetricsPipeline,
+                              MetricsPipelineRepository)
+
 
 def setup_logging() -> None:
     LOGGING_FORMAT="%(asctime)s | %(levelname)s | %(message)s"
@@ -14,15 +20,18 @@ if __name__ == "__main__":
     repository = MetricsPipelineRepository()
     repository.load_from_file(PIPELINE_RESULTS_FILE)
 
-    datasets = ["scene"]
-    loader = DatasetsLoader(datasets)
+    loader = DatasetsLoader(["scene"])
     loader.load()
     loader.describe()
 
-    # print(repository.raw_evaluation_results)
+    models = {
+        "baseline_binary_relevance_model": BinaryRelevance(
+           classifier=SVC(),
+            require_dense=[False, True]
+        ),
+    }
 
-    # b = MetricsPipeline(repository)
-    # b.run()
+    pipe = MetricsPipeline(repository, loader, models)
+    pipe.run()
 
-    # repository.save_to_file(PIPELINE_RESULTS_FILE)
-    
+    repository.save_to_file(PIPELINE_RESULTS_FILE)

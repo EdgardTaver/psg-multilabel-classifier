@@ -1,14 +1,15 @@
+import logging
 import os
 from typing import Any, Dict, List
+
 import pandas as pd
-from metrics.evaluation import EvaluationPipeline, EvaluationPipelineResult
-from metrics.support import evaluation_results_to_flat_table, flat_table_to_evaluation_results
-from metrics.types import RawEvaluationResults
-from sklearn.svm import SVC
-from skmultilearn.problem_transform import BinaryRelevance
 from skmultilearn.dataset import load_dataset
 
-import logging
+from metrics.evaluation import EvaluationPipeline, EvaluationPipelineResult
+from metrics.support import (evaluation_results_to_flat_table,
+                             flat_table_to_evaluation_results)
+from metrics.types import RawEvaluationResults
+
 
 class MetricsPipeline:
     def __init__(
@@ -21,45 +22,44 @@ class MetricsPipeline:
         self.datasets_loader = datasets_loader
         self.models = models
 
-    def run(self):        
-        # TODO: should run the models and get the evaluation results
+    def run(self):
+        logging.info("pipeline: getting metrics for all the models")
 
         datasets = self.datasets_loader.get()
         
-        baseline_binary_relevance_model = BinaryRelevance(
-            classifier=SVC(),
-            require_dense=[False, True]
-        )
+        total_datasets = len(datasets)
+        total_models = len(self.models)
 
-        models = {
-            "baseline_binary_relevance_model": baseline_binary_relevance_model,
-        }
+        total_evaluations = total_datasets * total_models
+        evaluation_index = 0
 
-        logging.info("will start getting metrics for all the models")
-
-        for model_name, model in models.items():
-            logging.info(f"# running model `{model_name}`")
+        for model_name, model in self.models.items():
+            evaluation_index += 1
 
             n_folds = 2
             evaluation_pipeline = EvaluationPipeline(model, n_folds)
 
             for dataset_name, info in datasets.items():
-                logging.info(f"## running dataset `{dataset_name}`")
+                log_fields = {
+                    "model": model_name,
+                    "dataset": dataset_name,
+                    "n_folds": n_folds,
+                    "evaluation_index": evaluation_index,
+                    "total_evaluations": total_evaluations,
+                }
+
+                logging.info(f"running evaluation | {log_fields}")
 
                 if self.repository.result_already_exists(model_name, dataset_name):
-                    logging.warn(f"## dataset `{dataset_name}` was already evaluated for model `{model_name}`")
+                    logging.info(f"dataset already evaluated, skipping | {log_fields}")
                     continue
 
                 result = evaluation_pipeline.run(info["X"], info["y"])
                 self.repository.add_result(model_name, dataset_name, result)
 
-                logging.info(f"results obtained:")
-                result.describe()
+                logging.info(f"evaluation finished | {log_fields}")
         
-        logging.info("finished getting metrics for all the models")
-    
-    def load_datasets(self) -> None:
-        pass
+        logging.info("pipeline: finished running all evaluations")
 
 
 class DatasetsLoader:
