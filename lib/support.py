@@ -135,9 +135,17 @@ class MutualInformation:
         return results
 
 
-def build_chain_based_on_f_test(f_test_results: pd.DataFrame) -> List[int]:
+def build_descending_chain_based_on_f_test(f_test_results: pd.DataFrame) -> List[int]:    
+    return build_chain_based_on_f_test(f_test_results, False)
+
+
+def build_ascending_chain_based_on_f_test(f_test_results: pd.DataFrame) -> List[int]:
+    return build_chain_based_on_f_test(f_test_results, True)
+
+
+def build_chain_based_on_f_test(f_test_results: pd.DataFrame, ascending_chain: bool) -> List[int]:
     chain = []
-    sorted_res = f_test_results.sort_values(by=["f_test_result"], ascending=False)
+    sorted_res = f_test_results.sort_values(by=["f_test_result"], ascending=ascending_chain)
     
     element = int(sorted_res.iloc[0]["for_label"])
     chain.append(element)
@@ -147,30 +155,7 @@ def build_chain_based_on_f_test(f_test_results: pd.DataFrame) -> List[int]:
     
     while m.sum() > 0:
         sliced_res = sorted_res[m]
-        sorted_sliced_res = sliced_res.sort_values(by=["f_test_result"], ascending=False)
-
-        element = int(sorted_sliced_res.iloc[0]["expand_this_label"])
-        chain.append(element)
-
-        m = ~sorted_res["expand_this_label"].isin(chain)
-        m &= sorted_res["for_label"] == element
-    
-    return chain
-
-# TODO: come up with a better name
-def build_reversed_chain_based_on_f_test(f_test_results: pd.DataFrame) -> List[int]:
-    chain = []
-    sorted_res = f_test_results.sort_values(by=["f_test_result"], ascending=True)
-    
-    element = int(sorted_res.iloc[0]["for_label"])
-    chain.append(element)
-
-    m = ~sorted_res["expand_this_label"].isin(chain)
-    m &= sorted_res["for_label"] == element
-    
-    while m.sum() > 0:
-        sliced_res = sorted_res[m]
-        sorted_sliced_res = sliced_res.sort_values(by=["f_test_result"], ascending=True)
+        sorted_sliced_res = sliced_res.sort_values(by=["f_test_result"], ascending=ascending_chain)
 
         element = int(sorted_sliced_res.iloc[0]["expand_this_label"])
         chain.append(element)
