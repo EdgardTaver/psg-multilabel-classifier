@@ -136,8 +136,6 @@ class MutualInformation:
 
 
 def build_chain_based_on_f_test(f_test_results: pd.DataFrame) -> List[int]:
-    # TODO: add test for this
-    
     chain = []
     sorted_res = f_test_results.sort_values(by=["f_test_result"], ascending=False)
     
