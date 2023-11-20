@@ -133,7 +133,7 @@ class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
         self.classes_ = np.arange(y.shape[1])
         # NOTE: this is required to run the evaluation pipeline
         
-        f_test_ordering = build_chain_based_on_f_test(self.calculator.get(y))        
+        f_test_ordering = build_chain_based_on_f_test(self.calculator.get(y))
         self.main_classifier = ClassifierChain(
             base_classifier=self.base_classifier,
             order=f_test_ordering,
