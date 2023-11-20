@@ -17,6 +17,7 @@ from lib.support import (
     ConditionalEntropies,
     MutualInformation,
     build_descending_chain_based_on_f_test,
+    build_chain_based_on_f_test,
 )
 from lib.base_models import ClassifierChain, PartialClassifierChains
 
@@ -114,26 +115,45 @@ class StackingWithFTests(MultiLabelClassifier):
         return reshaped_array
     
 class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
+    """
+    Trains a ClassifierChain using the labels correlation calculated with F-Test
+    to determine the order of the labels in the chain.
+
+    Arguments:
+        `ascending_chain`:
+            - if True, the chain will be built in ascending order,
+              from the least correlated label to the most correlated.
+            - if False, the chain will be built in descending order,
+              from the most correlated label to the least correlated.
+            - default behavior is False.
+
+        `base_classifier`: the classifier to be used as the base for the chain.
+    """
+
     def __init__(
         self,
+        ascending_chain: bool = False,
         base_classifier: Any = RandomForestClassifier(),
     ):
         super().__init__()
+        self.copyable_attrs = ["base_classifier"]
+        # NOTE: this `copyable_attrs` must match exactly the arguments passed to the constructor
 
         self.main_classifier = None
-        self.copyable_attrs = ["base_classifier", "alpha"]
-        # NOTE: this `copyable_attrs` must match exactly the arguments passed to the constructor
-        
+        self.ascending_chain = ascending_chain
         self.base_classifier = base_classifier
         self.calculator = CalculateLabelsCorrelationWithFTest(alpha=1)
-        # alpha=1 because we need to get a full chain ordering
+        # `alpha=1` because we need to get a full chain ordering
         # therefore we need all the labels
     
     def fit(self, X: Any, y: Any):
         self.classes_ = np.arange(y.shape[1])
         # NOTE: this is required to run the evaluation pipeline
+        # TODO: ideia -> this could be somehow abstracted to a mixin class
         
-        f_test_ordering = build_descending_chain_based_on_f_test(self.calculator.get(y))
+        f_test_ordering = build_chain_based_on_f_test(
+            self.calculator.get(y), self.ascending_chain)
+        
         self.main_classifier = ClassifierChain(
             base_classifier=self.base_classifier,
             order=f_test_ordering,
