@@ -2,6 +2,8 @@ import logging
 
 from sklearn.svm import SVC
 from skmultilearn.problem_transform import BinaryRelevance
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
 
 from metrics.pipeline import (DatasetsLoader, MetricsPipeline,
                               MetricsPipelineRepository)
@@ -18,11 +20,27 @@ if __name__ == "__main__":
     setup_logging()
 
     repository = MetricsPipelineRepository(PIPELINE_RESULTS_FILE)
-    loader = DatasetsLoader(["birds"])
+    loader = DatasetsLoader(["scene", "birds"])
 
     models = {
-        "baseline_binary_relevance_model": BinaryRelevance(
-           classifier=SVC(),
+        "baseline_binary_relevance_model_svc_123": BinaryRelevance(
+            classifier=SVC(random_state=123),
+            require_dense=[False, True]
+        ),
+        "baseline_binary_relevance_model_svc_456": BinaryRelevance(
+            classifier=SVC(random_state=456),
+            require_dense=[False, True]
+        ),
+        "baseline_binary_relevance_model_rfc_123": BinaryRelevance(
+            classifier=RandomForestClassifier(random_state=123),
+            require_dense=[False, True]
+        ),
+        "baseline_binary_relevance_model_rfc_456": BinaryRelevance(
+            classifier=RandomForestClassifier(random_state=456),
+            require_dense=[False, True]
+        ),
+        "baseline_binary_relevance_model_knn": BinaryRelevance(
+            classifier=KNeighborsClassifier(),
             require_dense=[False, True]
         ),
     }
