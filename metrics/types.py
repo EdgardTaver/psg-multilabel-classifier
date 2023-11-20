@@ -35,3 +35,17 @@ class EvaluationPipelineResult:
 
     def raw(self) -> CrossValidatedResults:
         return self.cross_validated_results
+
+    def __eq__(self, __value: object) -> bool:
+        if not isinstance(__value, EvaluationPipelineResult):
+            return False
+    
+        for metric_name, metric_results in self.cross_validated_results.items():
+
+            if metric_name not in __value.cross_validated_results.keys():
+                return False
+            
+            if list(metric_results) != list(__value.cross_validated_results[metric_name]):
+                return False
+        
+        return True

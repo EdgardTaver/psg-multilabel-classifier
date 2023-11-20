@@ -90,7 +90,11 @@ class MetricsPipeline:
 
 
 
-class EvaluationResults:
+class MetricsPipelineResults:
+    """
+    Wrapper for `RawEvaluationResults` with additional functionality.
+    """
+    
     raw_evaluation_results: RawEvaluationResults
 
     def __init__(self) -> None:
