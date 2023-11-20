@@ -1,4 +1,4 @@
-from lib.metrics_pipeline import MetricsPipeline
+from metrics.pipeline import MetricsPipeline
 import logging
 
 def setup_logging() -> None:

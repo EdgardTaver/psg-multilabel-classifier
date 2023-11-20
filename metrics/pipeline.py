@@ -1,4 +1,7 @@
-from lib.evaluation import EvaluationPipeline
+from typing import Dict
+
+import pandas as pd
+from lib.evaluation import EvaluationPipeline, EvaluationPipelineResult
 from sklearn.svm import SVC
 from skmultilearn.problem_transform import BinaryRelevance
 from skmultilearn.dataset import load_dataset
@@ -85,6 +88,31 @@ class MetricsPipeline:
         
         logging.info(evaluation_results)
         logging.info(evaluation_results["baseline_binary_relevance_model"]["scene"].raw())
+
+
+
+
+class EvaluationResults:
+    raw_evaluation_results: RawEvaluationResults
+
+    def __init__(self) -> None:
+        self.raw_evaluation_results = {}
+    
+    def load_from_file(self, path:str) -> None:
+        pass
+    
+    def save_to_file(self, path:str) -> None:
+        pass
+
+    def add_result(self, model_name: str, dataset_name: str, result: EvaluationPipelineResult) -> None:
+        self.raw_evaluation_results[model_name][dataset_name] = result
+
+    pass
+
+def evaluation_results_to_flat_table(evaluation_results: RawEvaluationResults) -> pd.DataFrame:
+    flat_table = pd.DataFrame()
+    return flat_table
+
 
 """
 Notes during development:

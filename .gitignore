@@ -1,5 +1,6 @@
 __pycache__/*
 lib/__pycache__/*
+metrics/__pycache__/*
 notebooks/__pycache__/*
 .pytest_cache/*
 env/*
