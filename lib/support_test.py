@@ -6,7 +6,8 @@ from skmultilearn.dataset import load_dataset
 from lib.helper import expect_data_frames_to_be_equal
 from lib.support import (CalculateLabelsCorrelationWithFTest,
                          ConditionalEntropies, MutualInformation,
-                         build_chain_based_on_f_test)
+                         build_chain_based_on_f_test,
+                         build_reversed_chain_based_on_f_test)
 
 
 def test_calculate_labels_correlation_with_f_test():
@@ -67,5 +68,18 @@ def test_build_chain_based_on_f_test():
     
     exercise = build_chain_based_on_f_test(f_test_results)
     expected = [5, 4, 1, 3, 0, 2]
+
+    assert exercise == expected
+
+
+# TODO: comen up with a better name
+def test_build_reversed_chain_based_on_f_test():
+    full_data = load_dataset("scene", "undivided")
+    _, y, _, _ = full_data
+
+    f_test_results = CalculateLabelsCorrelationWithFTest(alpha=1).get(y)
+    
+    exercise = build_reversed_chain_based_on_f_test(f_test_results)
+    expected = [3, 4, 0, 5, 1, 2]
 
     assert exercise == expected
