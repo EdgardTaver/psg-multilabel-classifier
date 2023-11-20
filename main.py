@@ -1,4 +1,4 @@
-from metrics.pipeline import MetricsPipeline, MetricsPipelineRepository
+from metrics.pipeline import MetricsPipeline, MetricsPipelineRepository, DatasetsLoader
 import logging
 
 def setup_logging() -> None:
@@ -17,7 +17,6 @@ if __name__ == "__main__":
     datasets = ["scene"]
     loader = DatasetsLoader(datasets)
     loader.load()
-
     loader.describe()
 
     # print(repository.raw_evaluation_results)

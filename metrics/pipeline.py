@@ -1,4 +1,5 @@
 import os
+from typing import Any, Dict, List
 import pandas as pd
 from metrics.evaluation import EvaluationPipeline, EvaluationPipelineResult
 from metrics.support import evaluation_results_to_flat_table, flat_table_to_evaluation_results
@@ -10,57 +11,21 @@ from skmultilearn.dataset import load_dataset
 import logging
 
 class MetricsPipeline:
-    def __init__(self, repository: "MetricsPipelineRepository"):
+    def __init__(
+        self,
+        repository: "MetricsPipelineRepository",
+        datasets_loader: "DatasetsLoader",
+        models: Dict[str, Any],
+    ) -> None:
         self.repository = repository
+        self.datasets_loader = datasets_loader
+        self.models = models
 
-    def run(self):
-        # TODO: should be able to get info about each dataset
-        # - rows; -labels
-        
+    def run(self):        
         # TODO: should run the models and get the evaluation results
 
-        # desired_datasets = ["scene", "emotions", "birds"]
-        desired_datasets = ["scene"]
-
-        datasets = {}
-        for dataset_name in desired_datasets:
-            print(f"getting dataset `{dataset_name}`")
-            
-            full_dataset = load_dataset(dataset_name, "undivided")
-            if full_dataset is None:
-                raise Exception(f"dataset `{dataset_name}` not found")
-            X, y, _, _ = full_dataset
-
-            train_dataset = load_dataset(dataset_name, "train")
-            if train_dataset is None:
-                raise Exception(f"dataset `{dataset_name}` not found")
-            X_train, y_train, _, _ = train_dataset
-
-            test_dataset = load_dataset(dataset_name, "test")
-            if test_dataset is None:
-                raise Exception(f"dataset `{dataset_name}` not found")
-            X_test, y_test, _, _ = test_dataset
-
-            datasets[dataset_name] = {
-                "X": X,
-                "y": y,
-                "X_train": X_train,
-                "y_train": y_train,
-                "X_test": X_test,
-                "y_test": y_test,
-                "rows": X.shape[0],
-                "labels_count": y.shape[1]
-            }
+        datasets = self.datasets_loader.get()
         
-
-        for name, info in datasets.items():
-            logging.info("===")
-            logging.info(f"information for dataset `{name}`")
-            logging.info(f"rows: {info['rows']}, labels: {info['labels_count']}")
-
-
-        logging.info("finished getting all datasets")
-
         baseline_binary_relevance_model = BinaryRelevance(
             classifier=SVC(),
             require_dense=[False, True]
@@ -92,6 +57,10 @@ class MetricsPipeline:
                 result.describe()
         
         logging.info("finished getting metrics for all the models")
+    
+    def load_datasets(self) -> None:
+        pass
+
 
 class DatasetsLoader:
     def __init__(self, dataset_names: List[str]) -> None:
@@ -132,6 +101,12 @@ class DatasetsLoader:
 
         logging.info("finished getting all datasets")
     
+    def get(self) -> Dict[str, Any]:
+        if len(self.loaded_datasets) == 0:
+            raise Exception("no datasets loaded")
+
+        return self.loaded_datasets
+
     def describe(self) -> None:
         for name, info in self.loaded_datasets.items():
             structured_log = {
