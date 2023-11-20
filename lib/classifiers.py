@@ -16,7 +16,6 @@ from lib.support import (
     CalculateLabelsCorrelationWithFTest,
     ConditionalEntropies,
     MutualInformation,
-    build_descending_chain_based_on_f_test,
     build_chain_based_on_f_test,
 )
 from lib.base_models import PatchedClassifierChain, PartialClassifierChains
