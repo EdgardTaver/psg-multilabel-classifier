@@ -11,13 +11,19 @@ PIPELINE_RESULTS_FILE = "./data/metrics.csv"
 if __name__ == "__main__":
     setup_logging()
 
-    a = MetricsPipelineRepository()
-    a.load_from_file(PIPELINE_RESULTS_FILE)
+    repository = MetricsPipelineRepository()
+    repository.load_from_file(PIPELINE_RESULTS_FILE)
 
-    print(a.raw_evaluation_results)
+    datasets = ["scene"]
+    loader = DatasetsLoader(datasets)
+    loader.load()
 
-    b = MetricsPipeline(a)
-    b.run()
+    loader.describe()
 
-    a.save_to_file(PIPELINE_RESULTS_FILE)
+    # print(repository.raw_evaluation_results)
+
+    # b = MetricsPipeline(repository)
+    # b.run()
+
+    # repository.save_to_file(PIPELINE_RESULTS_FILE)
     

@@ -93,6 +93,54 @@ class MetricsPipeline:
         
         logging.info("finished getting metrics for all the models")
 
+class DatasetsLoader:
+    def __init__(self, dataset_names: List[str]) -> None:
+        self.dataset_names = dataset_names
+        self.loaded_datasets = {}
+    
+    def load(self) -> None:
+        self.loaded_datasets = {}
+
+        for dataset_name in self.dataset_names:
+            print(f"getting dataset `{dataset_name}`")
+            
+            full_dataset = load_dataset(dataset_name, "undivided")
+            if full_dataset is None:
+                raise Exception(f"dataset `{dataset_name}` not found")
+            X, y, _, _ = full_dataset
+
+            train_dataset = load_dataset(dataset_name, "train")
+            if train_dataset is None:
+                raise Exception(f"dataset `{dataset_name}` not found")
+            X_train, y_train, _, _ = train_dataset
+
+            test_dataset = load_dataset(dataset_name, "test")
+            if test_dataset is None:
+                raise Exception(f"dataset `{dataset_name}` not found")
+            X_test, y_test, _, _ = test_dataset
+
+            self.loaded_datasets[dataset_name] = {
+                "X": X,
+                "y": y,
+                "X_train": X_train,
+                "y_train": y_train,
+                "X_test": X_test,
+                "y_test": y_test,
+                "rows": X.shape[0],
+                "labels_count": y.shape[1]
+            }
+
+        logging.info("finished getting all datasets")
+    
+    def describe(self) -> None:
+        for name, info in self.loaded_datasets.items():
+            structured_log = {
+                "dataset": name,
+                "rows": info["rows"],
+                "labels_count": info["labels_count"],
+            }
+
+            logging.info(f"information for dataset: {structured_log}")
 
 
 
