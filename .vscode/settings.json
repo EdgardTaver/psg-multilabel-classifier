@@ -4,6 +4,7 @@
         "classif",
         "hstack",
         "iloc",
+        "levelname",
         "ndarray",
         "preds",
         "pygad",
