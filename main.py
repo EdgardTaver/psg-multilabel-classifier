@@ -19,6 +19,7 @@ if __name__ == "__main__":
 
     repository = MetricsPipelineRepository(PIPELINE_RESULTS_FILE)
     loader = DatasetsLoader(["scene"])
+
     models = {
         "baseline_binary_relevance_model": BinaryRelevance(
            classifier=SVC(),

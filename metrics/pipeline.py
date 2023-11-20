@@ -27,8 +27,8 @@ class MetricsPipeline:
 
         self.repository.load_from_file()
         self.datasets_loader.load()
-        
-        datasets = self.datasets_loader.get()
+
+        datasets = self.datasets_loader.list_datasets()
         
         total_datasets = len(datasets)
         total_models = len(self.models)
@@ -39,7 +39,7 @@ class MetricsPipeline:
         for model_name, model in self.models.items():
             evaluation_index += 1
 
-            n_folds = 2
+            n_folds = 10
             evaluation_pipeline = EvaluationPipeline(model, n_folds)
 
             for dataset_name, info in datasets.items():
@@ -105,7 +105,7 @@ class DatasetsLoader:
 
         logging.info("finished getting all datasets")
     
-    def get(self) -> Dict[str, Any]:
+    def list_datasets(self) -> Dict[str, Any]:
         if len(self.loaded_datasets) == 0:
             raise Exception("no datasets loaded")
 
