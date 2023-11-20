@@ -4,7 +4,9 @@ import pandas as pd
 from skmultilearn.dataset import load_dataset
 
 from lib.helper import expect_data_frames_to_be_equal
-from lib.support import CalculateLabelsCorrelationWithFTest, ConditionalEntropies, MutualInformation
+from lib.support import (CalculateLabelsCorrelationWithFTest,
+                         ConditionalEntropies, MutualInformation,
+                         build_chain_based_on_f_test)
 
 
 def test_calculate_labels_correlation_with_f_test():
@@ -54,5 +56,16 @@ def test_calculate_mutual_information():
         [0.020452654062164233, 0.05549564312085209, 0.042545897446177094, 0.007179125020240096, 0.7758023710944532, 0.07135498901603798],
         [0.02404112369146061, 0.04359110211677164, 0.052940844996621106, 0.046673847330065854, 0.07135498901603798, 0.6908320386874189]
     ]
+
+    assert exercise == expected
+
+def test_build_chain_based_on_f_test():
+    full_data = load_dataset("scene", "undivided")
+    _, y, _, _ = full_data
+
+    f_test_results = CalculateLabelsCorrelationWithFTest(alpha=1).get(y)
+    
+    exercise = build_chain_based_on_f_test(f_test_results)
+    expected = [5, 4, 1, 3, 0, 2]
 
     assert exercise == expected
