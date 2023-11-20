@@ -147,7 +147,7 @@ class DependantBinaryRelevance(MultiLabelClassifier):
         reshaped_array = np.asarray(second_layer_predictions).T
         return reshaped_array
 
-class ClassifierChain:
+class PatchedClassifierChain:
     """
     Works just like the `ClassifierChain` class from `skmultilearn`, but ensures
     that the output is in the same order as the labels in the dataset

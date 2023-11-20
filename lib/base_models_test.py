@@ -3,7 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 from skmultilearn.dataset import load_dataset
 
 from lib.base_models import (
-    ClassifierChain,
+    PatchedClassifierChain,
     DependantBinaryRelevance,
     PartialClassifierChains,
     StackedGeneralization,
@@ -74,7 +74,7 @@ def test_base_classifier_chain():
 
     X_test, y_test, _, _ = test_dataset
 
-    model = ClassifierChain(
+    model = PatchedClassifierChain(
         base_classifier=RandomForestClassifier(random_state=42),
         order=[4, 5, 2, 0, 3, 1],
     )

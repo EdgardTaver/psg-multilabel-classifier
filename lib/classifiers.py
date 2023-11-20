@@ -19,7 +19,7 @@ from lib.support import (
     build_descending_chain_based_on_f_test,
     build_chain_based_on_f_test,
 )
-from lib.base_models import ClassifierChain, PartialClassifierChains
+from lib.base_models import PatchedClassifierChain, PartialClassifierChains
 
 
 class StackingWithFTests(MultiLabelClassifier):
@@ -154,7 +154,7 @@ class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
         f_test_ordering = build_chain_based_on_f_test(
             self.calculator.get(y), self.ascending_chain)
         
-        self.main_classifier = ClassifierChain(
+        self.main_classifier = PatchedClassifierChain(
             base_classifier=self.base_classifier,
             order=f_test_ordering,
         )
@@ -224,7 +224,7 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
         ga_model.run()
 
         solution, _, _ = ga_model.best_solution()
-        best_classifier = ClassifierChain(
+        best_classifier = PatchedClassifierChain(
             base_classifier=copy.deepcopy(self.base_classifier),
             order=solution,
         )
@@ -252,7 +252,7 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
     def test_ordering(self, solution: List[int]):
         print(f"testing order: {solution}")
 
-        classifier = ClassifierChain(
+        classifier = PatchedClassifierChain(
             base_classifier=copy.deepcopy(self.base_classifier),
             order=solution,
         )
@@ -370,7 +370,7 @@ class ClassifierChainWithLOP(MultiLabelClassifier, LOPSolver):
         ga_model.run()
 
         solution, _, _ = ga_model.best_solution()
-        best_classifier = ClassifierChain(
+        best_classifier = PatchedClassifierChain(
             base_classifier=copy.deepcopy(self.base_classifier),
             order=solution,
         )
