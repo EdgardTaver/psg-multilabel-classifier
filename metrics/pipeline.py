@@ -1,4 +1,7 @@
+import os
+import pandas as pd
 from metrics.evaluation import EvaluationPipeline, EvaluationPipelineResult
+from metrics.support import evaluation_results_to_flat_table, flat_table_to_evaluation_results
 from metrics.types import RawEvaluationResults
 from sklearn.svm import SVC
 from skmultilearn.problem_transform import BinaryRelevance
@@ -94,23 +97,28 @@ class MetricsPipelineResults:
     """
     Wrapper for `RawEvaluationResults` with additional functionality.
     """
-    
+
     raw_evaluation_results: RawEvaluationResults
 
     def __init__(self) -> None:
         self.raw_evaluation_results = {}
     
     def load_from_file(self, path:str) -> None:
-        pass
+        if not path.endswith(".csv"):
+            raise Exception("only CSV files are supported")
+    
+        if not os.path.exists(path):
+            raise Exception("file does not exist")
+
+        df = pd.read_csv(path)
+        self.raw_evaluation_results = flat_table_to_evaluation_results(df)
     
     def save_to_file(self, path:str) -> None:
-        pass
+        df = evaluation_results_to_flat_table(self.raw_evaluation_results)
+        df.to_csv(path, index=False)
 
     def add_result(self, model_name: str, dataset_name: str, result: EvaluationPipelineResult) -> None:
         self.raw_evaluation_results[model_name][dataset_name] = result
-
-    pass
-
 
 
 
