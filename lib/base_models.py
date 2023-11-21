@@ -145,7 +145,7 @@ class DependantBinaryRelevance(MultiLabelClassifier):
         reshaped_array = np.asarray(second_layer_predictions).T
         return reshaped_array
 
-class PatchedClassifierChain:
+class PatchedClassifierChain(MultiLabelClassifier):
     """
     Works just like the `ClassifierChain` class from `skmultilearn`, but ensures
     that the output is in the same order as the labels in the dataset
@@ -156,6 +156,7 @@ class PatchedClassifierChain:
         if has_duplicates(order):
             raise Exception("the order must not contain duplicated values")
 
+        self.copyable_attrs = ["base_classifier", "order"]
         self.base_classifier = base_classifier
         self.order = order
     
@@ -228,7 +229,7 @@ class PatchedClassifierChain:
         reshaped_array = np.asarray(predictions_in_original_label_order).T
         return reshaped_array
 
-class PartialClassifierChains:
+class PartialClassifierChains(MultiLabelClassifier):
     """
     Allows for partial orders to be used in the classifier chain.
     """
