@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Dict
 
 from sklearn.neighbors import KNeighborsClassifier
 from skmultilearn.problem_transform import BinaryRelevance
@@ -6,7 +7,8 @@ from skmultilearn.problem_transform import BinaryRelevance
 from lib.base_models import (DependantBinaryRelevance, PatchedClassifierChain,
                              StackedGeneralization)
 from lib.classifiers import (ClassifierChainWithFTestOrdering,
-                             ClassifierChainWithLOP, StackingWithFTests, PartialClassifierChainWithLOP)
+                             ClassifierChainWithLOP,
+                             PartialClassifierChainWithLOP, StackingWithFTests)
 from metrics.pipeline import (DatasetsLoader, MetricsPipeline,
                               MetricsPipelineRepository)
 
@@ -36,14 +38,8 @@ def build_dataset_loader() -> DatasetsLoader:
         "yeast",
     ])
 
-
-if __name__ == "__main__":
-    setup_logging()
-
-    repository = build_repository()
-    loader = build_dataset_loader()
-
-    models = {
+def build_models_list() -> Dict[str, Any]:
+    return {
         "baseline_binary_relevance_model": BinaryRelevance(
             classifier=KNeighborsClassifier(),
             require_dense=[False, True]
@@ -103,5 +99,13 @@ if __name__ == "__main__":
         ),
     }
 
-    # pipe = MetricsPipeline(repository, loader, models)
-    # pipe.run()
+
+if __name__ == "__main__":
+    setup_logging()
+
+    repository = build_repository()
+    loader = build_dataset_loader()
+    models = build_models_list()
+
+    pipe = MetricsPipeline(repository, loader, models)
+    pipe.run()
