@@ -1,14 +1,14 @@
 import logging
 
-from sklearn.svm import SVC
-from skmultilearn.problem_transform import BinaryRelevance
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from lib.base_models import StackedGeneralization, DependantBinaryRelevance, PatchedClassifierChain
+from skmultilearn.problem_transform import BinaryRelevance
 
+from lib.base_models import (DependantBinaryRelevance, PatchedClassifierChain,
+                             StackedGeneralization)
 from metrics.pipeline import (DatasetsLoader, MetricsPipeline,
                               MetricsPipelineRepository)
 
+from lib.classifiers import StackingWithFTests
 
 def setup_logging() -> None:
     LOGGING_FORMAT="%(asctime)s | %(levelname)s | %(message)s"
@@ -56,6 +56,18 @@ if __name__ == "__main__":
         "baseline_classifier_chain": PatchedClassifierChain(
             base_classifier=KNeighborsClassifier(),
         ),
+        "stacking_with_f_tests-alpha=0.25": StackingWithFTests(
+            base_classifier=KNeighborsClassifier(),
+            alpha=0.25,
+        ),
+        "stacking_with_f_tests-alpha=0.50": StackingWithFTests(
+            base_classifier=KNeighborsClassifier(),
+            alpha=0.50,
+        ),
+        "stacking_with_f_tests-alpha=0.75": StackingWithFTests(
+            base_classifier=KNeighborsClassifier(),
+            alpha=0.75,
+        )
     }
 
     # pipe = MetricsPipeline(repository, loader, models)
