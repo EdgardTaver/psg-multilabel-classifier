@@ -82,23 +82,23 @@ class DatasetsLoader:
                 raise Exception(f"dataset `{dataset_name}` not found")
             X, y, _, _ = full_dataset
 
-            train_dataset = load_dataset(dataset_name, "train")
-            if train_dataset is None:
-                raise Exception(f"dataset `{dataset_name}` not found")
-            X_train, y_train, _, _ = train_dataset
+            # train_dataset = load_dataset(dataset_name, "train")
+            # if train_dataset is None:
+            #     raise Exception(f"dataset `{dataset_name}` not found")
+            # X_train, y_train, _, _ = train_dataset
 
-            test_dataset = load_dataset(dataset_name, "test")
-            if test_dataset is None:
-                raise Exception(f"dataset `{dataset_name}` not found")
-            X_test, y_test, _, _ = test_dataset
+            # test_dataset = load_dataset(dataset_name, "test")
+            # if test_dataset is None:
+            #     raise Exception(f"dataset `{dataset_name}` not found")
+            # X_test, y_test, _, _ = test_dataset
 
             self.loaded_datasets[dataset_name] = {
                 "X": X,
                 "y": y,
-                "X_train": X_train,
-                "y_train": y_train,
-                "X_test": X_test,
-                "y_test": y_test,
+                # "X_train": X_train,
+                # "y_train": y_train,
+                # "X_test": X_test,
+                # "y_test": y_test,
                 "rows": X.shape[0],
                 "features_count": X.shape[1],
                 "labels_count": y.shape[1]
