@@ -17,9 +17,11 @@ class StackedGeneralization(MultiLabelClassifier):
 
     def __init__(self, classifier: Any):
         super().__init__()
+        self.copyable_attrs = ["classifier"]
+        self.classifier = classifier
 
-        first_base_classifier = copy.deepcopy(classifier)
-        second_base_classifier = copy.deepcopy(classifier)
+        first_base_classifier = copy.deepcopy(self.classifier)
+        second_base_classifier = copy.deepcopy(self.classifier)
 
         self.first_layer_classifiers = BinaryRelevance(
             classifier=first_base_classifier,
@@ -39,26 +41,26 @@ class StackedGeneralization(MultiLabelClassifier):
         formatted_first_layer_predictions = first_layer_predictions.todense()
         X_expanded = np.hstack([X.todense(), formatted_first_layer_predictions])
 
-        first_layer_sum = np.sum(np.sum(formatted_first_layer_predictions, axis=1))
-        print("FIT: summing the values (for first layer):", first_layer_sum)
+        # first_layer_sum = np.sum(np.sum(formatted_first_layer_predictions, axis=1))
+        # print("FIT: summing the values (for first layer):", first_layer_sum)
 
         print(f"FIT: X_extended shape is {X_expanded.shape}")
         self.second_layer_classifiers.fit(X_expanded, y)
     
     def predict(self, X: Any) -> Any:
-        print(f"PREDICT: X shape is {X.shape}")
+        # print(f"PREDICT: X shape is {X.shape}")
         first_layer_predictions = self.first_layer_classifiers.predict(X)
         formatted_first_layer_predictions = first_layer_predictions.todense()
 
         X_expanded = np.hstack([X.todense(), formatted_first_layer_predictions])
 
-        print("PREDICT: summing the values (for first layer):", np.sum(np.sum(formatted_first_layer_predictions, axis=1)))
-        print(f"PREDICT: X_extended shape is {X_expanded.shape}")
+        # print("PREDICT: summing the values (for first layer):", np.sum(np.sum(formatted_first_layer_predictions, axis=1)))
+        # print(f"PREDICT: X_extended shape is {X_expanded.shape}")
 
         second_layer_predictions = self.second_layer_classifiers.predict(X_expanded)
-        formatted_second_layer_predictions = second_layer_predictions.todense()
-
-        print("PREDICT: summing the values (for second layer):", np.sum(np.sum(formatted_second_layer_predictions, axis=1)))
+        
+        # formatted_second_layer_predictions = second_layer_predictions.todense()
+        # print("PREDICT: summing the values (for second layer):", np.sum(np.sum(formatted_second_layer_predictions, axis=1)))
 
         return second_layer_predictions
 
@@ -69,6 +71,8 @@ class DependantBinaryRelevance(MultiLabelClassifier):
 
     def __init__(self, classifier: Any):
         super().__init__()
+        self.copyable_attrs = ["classifier"]
+        self.classifier = classifier
 
         self.first_base_classifier = copy.deepcopy(classifier)
         self.second_base_classifier = copy.deepcopy(classifier)
@@ -89,17 +93,15 @@ class DependantBinaryRelevance(MultiLabelClassifier):
         formatted_first_layer_predictions = first_layer_predictions.todense()
         X_expanded = np.hstack([X.todense(), formatted_first_layer_predictions])
 
-        first_layer_sum = np.sum(np.sum(formatted_first_layer_predictions, axis=1))
-        print("FIT: summing the values (for first layer):", first_layer_sum)
+        # first_layer_sum = np.sum(np.sum(formatted_first_layer_predictions, axis=1))
+        # print("FIT: summing the values (for first layer):", first_layer_sum)
 
         self.labels_count = y.shape[1]
 
         for i in range(self.labels_count):
             labels_to_expand = [x for x in range(self.labels_count) if x != i]
-            print(f"these are labels_to_expand: {labels_to_expand} | {i}")
-
             additional_input = formatted_first_layer_predictions[:, labels_to_expand]
-            print(f"FIT: additional input shape is {additional_input.shape}")
+            # print(f"FIT: additional input shape is {additional_input.shape}")
 
             X_expanded = np.hstack([X.todense(), additional_input])
             X_expanded = np.asarray(X_expanded)
@@ -122,26 +124,22 @@ class DependantBinaryRelevance(MultiLabelClassifier):
         if self.labels_count == 0:
             raise Exception("you must call `fit` before calling `predict`")
 
-        print(f"PREDICT: X shape is {X.shape}")
+        # print(f"PREDICT: X shape is {X.shape}")
         first_layer_predictions = self.first_layer_classifiers.predict(X)
         formatted_first_layer_predictions = first_layer_predictions.todense()
 
         second_layer_predictions = []
         for i in range(self.labels_count):
             labels_to_expand = [x for x in range(self.labels_count) if x != i]
-            print(f"these are labels_to_expand: {labels_to_expand} | {i}")
-
             additional_input = formatted_first_layer_predictions[:, labels_to_expand]
-            print(f"PREDICT: additional input shape is {additional_input.shape}")
+            # print(f"PREDICT: additional input shape is {additional_input.shape}")
 
             X_expanded = np.hstack([X.todense(), additional_input])
             X_expanded = np.asarray(X_expanded)
 
-            print(f"PREDICT: X_extended shape, for label {i}, is {X_expanded.shape}")
+            # print(f"PREDICT: X_extended shape, for label {i}, is {X_expanded.shape}")
 
             temp_preds = self.second_layer_classifiers[i].predict(X_expanded)
-            print(f"temp_preds shape is {temp_preds.shape}")
-            
             second_layer_predictions.append(temp_preds)
 
         reshaped_array = np.asarray(second_layer_predictions).T
