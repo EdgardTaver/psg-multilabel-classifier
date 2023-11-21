@@ -24,7 +24,7 @@ def test_base_stacked_generalization():
 
     X_test, y_test, _, _ = test_dataset
 
-    model = StackedGeneralization(classifier=RandomForestClassifier(random_state=42))
+    model = StackedGeneralization(base_classifier=RandomForestClassifier(random_state=42))
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
 
@@ -49,7 +49,7 @@ def test_base_dependant_binary_relevance():
 
     X_test, y_test, _, _ = test_dataset
 
-    model = DependantBinaryRelevance(classifier=RandomForestClassifier(random_state=42))
+    model = DependantBinaryRelevance(base_classifier=RandomForestClassifier(random_state=42))
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
 

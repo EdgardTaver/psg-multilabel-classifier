@@ -15,13 +15,13 @@ class StackedGeneralization(MultiLabelClassifier):
     first_layer_classifiers: BinaryRelevance
     second_layer_classifiers: BinaryRelevance
 
-    def __init__(self, classifier: Any):
+    def __init__(self, base_classifier: Any):
         super().__init__()
-        self.copyable_attrs = ["classifier"]
-        self.classifier = classifier
+        self.copyable_attrs = ["base_classifier"]
+        self.base_classifier = base_classifier
 
-        first_base_classifier = copy.deepcopy(self.classifier)
-        second_base_classifier = copy.deepcopy(self.classifier)
+        first_base_classifier = copy.deepcopy(self.base_classifier)
+        second_base_classifier = copy.deepcopy(self.base_classifier)
 
         self.first_layer_classifiers = BinaryRelevance(
             classifier=first_base_classifier,
@@ -69,13 +69,13 @@ class DependantBinaryRelevance(MultiLabelClassifier):
     first_layer_classifiers: BinaryRelevance
     second_layer_classifiers: List[Any]
 
-    def __init__(self, classifier: Any):
+    def __init__(self, base_classifier: Any):
         super().__init__()
-        self.copyable_attrs = ["classifier"]
-        self.classifier = classifier
+        self.copyable_attrs = ["base_classifier"]
+        self.base_classifier = base_classifier
 
-        self.first_base_classifier = copy.deepcopy(classifier)
-        self.second_base_classifier = copy.deepcopy(classifier)
+        self.first_base_classifier = copy.deepcopy(self.base_classifier)
+        self.second_base_classifier = copy.deepcopy(self.base_classifier)
 
         self.first_layer_classifiers = BinaryRelevance(
             classifier=self.first_base_classifier,
