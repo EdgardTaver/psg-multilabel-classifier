@@ -410,6 +410,12 @@ class PartialClassifierChainWithLOP(MultiLabelClassifier, LOPSolver):
         num_generations: int = 5,
         random_state: Optional[int] = None,
     ) -> None:
+        super().__init__()
+        self.copyable_attrs = [
+            "base_classifier",
+            "num_generations",
+            "random_state"]
+        
         self.base_classifier = base_classifier
         self.threshold = threshold
         self.num_generations = num_generations
