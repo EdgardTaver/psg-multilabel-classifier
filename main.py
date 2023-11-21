@@ -14,7 +14,26 @@ def setup_logging() -> None:
     logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
 
 
-PIPELINE_RESULTS_FILE = "./data/metrics.csv"
+def build_repository() -> MetricsPipelineRepository:
+    PIPELINE_RESULTS_FILE = "./data/metrics.csv"
+    return MetricsPipelineRepository(PIPELINE_RESULTS_FILE)
+
+
+def build_dataset_loader() -> DatasetsLoader:
+    return DatasetsLoader([
+        "bibtex",
+        "birds",
+        "delicious",
+        "emotions",
+        "enron",
+        "genbase",
+        "mediamill",
+        "medical",
+        "scene",
+        "tmc2007_500",
+        "yeast",
+    ])
+
 
 if __name__ == "__main__":
     setup_logging()
