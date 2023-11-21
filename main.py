@@ -32,15 +32,15 @@ def build_dataset_loader() -> DatasetsLoader:
         
         # [done] not so fast datasets
         # "yeast", 
+        # "enron", 
+        # "genbase", 
 
         # slow datasets
         # "bibtex",
         # "delicious",
-        # "enron", 
-        # "genbase", 
-        # "mediamill", 
+        "mediamill", 
         # "medical", 
-        "tmc2007_500", 
+        # "tmc2007_500", 
     ])
 
 def build_models_list() -> Dict[str, Any]:
