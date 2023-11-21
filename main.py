@@ -25,17 +25,17 @@ def build_repository() -> MetricsPipelineRepository:
 
 def build_dataset_loader() -> DatasetsLoader:
     return DatasetsLoader([
-        "bibtex",
+        # "bibtex", # takes too long
         "birds",
-        "delicious",
+        # "delicious", # takes too long
         "emotions",
-        "enron",
-        "genbase",
-        "mediamill",
-        "medical",
+        # "enron",  # takes too long
+        # "genbase",  # takes too long
+        # "mediamill",  # takes too long
+        # "medical",  # takes too long
         "scene",
-        "tmc2007_500",
-        "yeast",
+        # "tmc2007_500",  # takes too long
+        # "yeast",  # takes too long
     ])
 
 def build_models_list() -> Dict[str, Any]:
