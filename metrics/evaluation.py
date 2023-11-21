@@ -31,6 +31,8 @@ class EvaluationPipeline:
             X, y,
             cv=self.n_folds,
             scoring=scoring_set,
-            return_train_score=True)
+            return_train_score=True,
+            verbose=10,
+            n_jobs=-1)
 
         return EvaluationPipelineResult(validate_result)
