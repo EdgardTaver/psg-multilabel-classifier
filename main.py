@@ -38,9 +38,11 @@ def build_dataset_loader() -> DatasetsLoader:
         # slow datasets
         # "bibtex",
         # "delicious",
-        "mediamill", 
-        # "medical", 
+        "medical", 
         # "tmc2007_500", 
+
+        # impossibly slow datasets
+        # "mediamill", 
     ])
 
 def build_models_list() -> Dict[str, Any]:
