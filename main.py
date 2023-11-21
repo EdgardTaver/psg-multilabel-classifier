@@ -34,14 +34,14 @@ def build_dataset_loader() -> DatasetsLoader:
         # "yeast", 
         # "enron", 
         # "genbase", 
+        # "medical", 
 
         # slow datasets
-        # "bibtex",
+        "tmc2007_500", 
         # "delicious",
-        "medical", 
-        # "tmc2007_500", 
 
         # impossibly slow datasets
+        # "bibtex",
         # "mediamill", 
     ])
 
