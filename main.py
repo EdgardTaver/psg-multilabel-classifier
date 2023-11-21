@@ -8,7 +8,7 @@ from lib.base_models import (DependantBinaryRelevance, PatchedClassifierChain,
 from metrics.pipeline import (DatasetsLoader, MetricsPipeline,
                               MetricsPipelineRepository)
 
-from lib.classifiers import StackingWithFTests
+from lib.classifiers import StackingWithFTests, ClassifierChainWithFTestOrdering
 
 def setup_logging() -> None:
     LOGGING_FORMAT="%(asctime)s | %(levelname)s | %(message)s"
@@ -67,7 +67,15 @@ if __name__ == "__main__":
         "stacking_with_f_tests-alpha=0.75": StackingWithFTests(
             base_classifier=KNeighborsClassifier(),
             alpha=0.75,
-        )
+        ),
+        "classifier_chain_with_f_test_ordering-ascending_chain=False": ClassifierChainWithFTestOrdering(
+            base_classifier=KNeighborsClassifier(),
+            ascending_chain=False,
+        ),
+        "classifier_chain_with_f_test_ordering-ascending_chain=True": ClassifierChainWithFTestOrdering(
+            base_classifier=KNeighborsClassifier(),
+            ascending_chain=True,
+        ),
     }
 
     # pipe = MetricsPipeline(repository, loader, models)
