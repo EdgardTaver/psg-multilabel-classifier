@@ -100,6 +100,7 @@ class DatasetsLoader:
                 "X_test": X_test,
                 "y_test": y_test,
                 "rows": X.shape[0],
+                "features_count": X.shape[1],
                 "labels_count": y.shape[1]
             }
 
@@ -116,6 +117,7 @@ class DatasetsLoader:
             structured_log = {
                 "dataset": name,
                 "rows": info["rows"],
+                "features_count": info["features_count"],
                 "labels_count": info["labels_count"],
             }
 
