@@ -273,6 +273,7 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
 
 
 class LOPSolver:
+    # TODO: this could be organized as a Mixin class
     def model_fitness_func(
         self, ga_instance: Any, solution: Any, solution_idx: Any
     ) -> float:
