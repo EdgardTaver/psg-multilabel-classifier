@@ -35,10 +35,14 @@ class StackingWithFTests(MultiLabelClassifier):
         use_first_layer_to_calculate_correlations: bool = False,
         base_classifier: Any = RandomForestClassifier(),
     ):
-        super().__init__()
-
         if alpha < 0.0 or alpha > 1.0:
             raise Exception("alpha must be >= 0.0 and <= 1.0")
+
+        super().__init__()
+        self.copyable_attrs = [
+            "base_classifier",
+            "alpha",
+            "use_first_layer_to_calculate_correlations"]
 
         self.base_classifier = base_classifier
         self.alpha = alpha
@@ -135,8 +139,9 @@ class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
         base_classifier: Any = RandomForestClassifier(),
     ):
         super().__init__()
-        self.copyable_attrs = ["base_classifier"]
-        # NOTE: this `copyable_attrs` must match exactly the arguments passed to the constructor
+        self.copyable_attrs = [
+            "base_classifier",
+            "ascending_chain"]
 
         self.main_classifier = None
         self.ascending_chain = ascending_chain
@@ -174,6 +179,12 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
         num_generations: int = 5,
         random_state: Optional[int] = None,
     ) -> None:
+        super().__init__()
+        self.copyable_attrs = [
+            "base_classifier",
+            "num_generations",
+            "random_state"]
+
         self.base_classifier = base_classifier
         self.num_generations = num_generations
 
@@ -328,6 +339,12 @@ class ClassifierChainWithLOP(MultiLabelClassifier, LOPSolver):
         num_generations: int = 5,
         random_state: Optional[int] = None,
     ) -> None:
+        super().__init__()
+        self.copyable_attrs = [
+            "base_classifier",
+            "num_generations",
+            "random_state"]
+        
         self.base_classifier = base_classifier
         self.num_generations = num_generations
 
