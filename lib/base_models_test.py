@@ -60,7 +60,7 @@ def test_base_dependant_binary_relevance():
     assert f1_score == 0.7065088014940012
 
 
-def test_base_classifier_chain():
+def test_base_classifier_chain_specific_order():
     dataset_name = "scene"
     train_dataset = load_dataset(dataset_name, "train")
     if train_dataset is None:
@@ -86,6 +86,37 @@ def test_base_classifier_chain():
 
     assert hamming_loss == 0.0883500557413601
     assert f1_score == 0.696385030865942
+
+def test_base_classifier_chain_no_order():
+    """
+    Should order the labels as they are present in the training dataset
+    if no particular order is specified.
+    """
+
+    dataset_name = "scene"
+    train_dataset = load_dataset(dataset_name, "train")
+    if train_dataset is None:
+        raise Exception("could not load dataset")
+
+    X_train, y_train, _, _ = train_dataset
+
+    test_dataset = load_dataset(dataset_name, "test")
+    if test_dataset is None:
+        raise Exception("could not load dataset")
+
+    X_test, y_test, _, _ = test_dataset
+
+    model = PatchedClassifierChain(
+        base_classifier=RandomForestClassifier(random_state=42),
+    )
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+
+    hamming_loss = metrics.hamming_loss(y_test, predictions)
+    f1_score = metrics.f1_score(y_test, predictions, average="macro")
+
+    assert hamming_loss == 0.0898829431438127
+    assert f1_score == 0.6944322263507309
 
 
 def test_base_partial_classifier_chains():

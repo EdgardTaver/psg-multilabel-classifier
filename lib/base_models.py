@@ -152,7 +152,7 @@ class PatchedClassifierChain:
     regardless of the custom order of the classifiers
     """
 
-    def __init__(self, base_classifier: Any, order: List[int]) -> None:
+    def __init__(self, base_classifier: Any, order: List[int] = []) -> None:
         if has_duplicates(order):
             raise Exception("the order must not contain duplicated values")
 
@@ -161,7 +161,9 @@ class PatchedClassifierChain:
     
     def fit(self, X: Any, y: Any):
         label_count = y.shape[1]
-        if label_count != len(self.order):
+        if len(self.order) == 0:
+            self.order = np.arange(label_count)
+        elif label_count != len(self.order):
             raise Exception("provided order does not match the label count")
 
         self.classifiers = {}
