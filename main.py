@@ -121,5 +121,3 @@ if __name__ == "__main__":
 
     pipe = MetricsPipeline(repository, loader, models)
     pipe.run()
-
-    # TODO: still missing the most robust CC with Genetic Algorithm
