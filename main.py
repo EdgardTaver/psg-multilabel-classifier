@@ -7,6 +7,7 @@ from skmultilearn.problem_transform import BinaryRelevance
 from lib.base_models import (DependantBinaryRelevance, PatchedClassifierChain,
                              StackedGeneralization)
 from lib.classifiers import (ClassifierChainWithFTestOrdering,
+                             ClassifierChainWithGeneticAlgorithm,
                              ClassifierChainWithLOP,
                              PartialClassifierChainWithLOP, StackingWithFTests)
 from metrics.pipeline import (DatasetsLoader, MetricsPipeline,
@@ -26,19 +27,19 @@ def build_repository() -> MetricsPipelineRepository:
 def build_dataset_loader() -> DatasetsLoader:
     return DatasetsLoader([
         # [done] fast datasets
-        # "birds",
-        # "emotions",
-        # "scene",
+        "birds",
+        "emotions",
+        "scene",
         
         # [done] not so fast datasets
-        # "yeast", 
-        # "enron", 
-        # "genbase", 
-        # "medical", 
+        "yeast", 
+        "enron", 
+        "genbase", 
+        "medical", 
 
         # [done] slow datasets
         # "tmc2007_500", 
-        
+
         # impossibly slow datasets
         # "delicious",
         # "bibtex",
@@ -103,6 +104,10 @@ def build_models_list() -> Dict[str, Any]:
         "partial_classifier_chain_with_lop-num_generations=50": PartialClassifierChainWithLOP(
             base_classifier=KNeighborsClassifier(),
             num_generations=50,
+        ),
+        "classifier_chain_with_genetic_algorithm-num_generations=5": ClassifierChainWithGeneticAlgorithm(
+            base_classifier=KNeighborsClassifier(),
+            num_generations=5,
         ),
     }
 
