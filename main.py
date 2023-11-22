@@ -1,5 +1,7 @@
+import argparse
 import logging
 from typing import Any, Dict
+import pandas as pd
 
 from sklearn.neighbors import KNeighborsClassifier
 from skmultilearn.problem_transform import BinaryRelevance
@@ -27,18 +29,18 @@ def build_repository() -> MetricsPipelineRepository:
 def build_dataset_loader() -> DatasetsLoader:
     return DatasetsLoader([
         # [done] fast datasets
-        # "birds",
-        # "emotions",
-        # "scene",
+        "birds",
+        "emotions",
+        "scene",
         
         # [done] not so fast datasets
-        # "yeast", 
-        # "enron", 
-        # "genbase", 
-        # "medical", 
+        "yeast", 
+        "enron", 
+        "genbase", 
+        "medical", 
 
         # [done] slow datasets
-        # "tmc2007_500", 
+        "tmc2007_500", 
 
         # impossibly slow datasets
         # "delicious",
@@ -112,12 +114,43 @@ def build_models_list() -> Dict[str, Any]:
     }
 
 
+DESCRIBE_DATASETS = "describe_datasets"
+DESCRIBE_METRICS = "describe_metrics"
+METRICS_TO_CSV = "metrics_to_csv"
+RUN_MODELS = "run_models"
+
 if __name__ == "__main__":
     setup_logging()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "task",
+        default=DESCRIBE_DATASETS,
+        help="action to be executed",
+        choices=[DESCRIBE_DATASETS, DESCRIBE_METRICS, METRICS_TO_CSV, RUN_MODELS],
+        action="store")
+    
+    args = parser.parse_args()
 
     repository = build_repository()
     loader = build_dataset_loader()
     models = build_models_list()
 
-    pipe = MetricsPipeline(repository, loader, models)
-    pipe.run()
+    if args.task == DESCRIBE_DATASETS:
+        loader.load()
+        loader.describe()
+    
+    if args.task == DESCRIBE_METRICS:
+        repository.load_from_file()
+        repository.describe_log()
+    
+    if args.task == METRICS_TO_CSV:
+        repository.load_from_file()
+        result = repository.describe_dict()
+
+        df = pd.DataFrame(result)
+        df.to_csv("./data/summarized_result.csv", index=False)
+
+    if args.task == RUN_MODELS:
+        pipe = MetricsPipeline(repository, loader, models)
+        pipe.run()

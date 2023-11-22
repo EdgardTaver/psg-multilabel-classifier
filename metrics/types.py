@@ -33,6 +33,16 @@ class EvaluationPipelineResult:
             self.cross_validated_results["test_f1"].std()
         ))
 
+    def describe_json(self) -> Dict[str, float]:
+        return {
+            "accuracy": self.cross_validated_results["test_accuracy"].mean(),
+            "accuracy_std": self.cross_validated_results["test_accuracy"].std(),
+            "hamming_loss": self.cross_validated_results["test_hamming_loss"].mean(),
+            "hamming_loss_std": self.cross_validated_results["test_hamming_loss"].std(),
+            "f1": self.cross_validated_results["test_f1"].mean(),
+            "f1_std": self.cross_validated_results["test_f1"].std(),
+        }
+
     def raw(self) -> CrossValidatedResults:
         return self.cross_validated_results
 

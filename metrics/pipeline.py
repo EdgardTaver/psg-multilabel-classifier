@@ -164,3 +164,29 @@ class MetricsPipelineRepository:
             return False
         
         return True
+
+    def describe_log(self):
+        results = self.describe_dict()
+        for result in results:
+            logging.info(f"information for evaluation: {result}")
+            
+    def describe_dict(self) -> List[Dict[str, float]]:
+        results = []
+
+        for model_name, model_results in self.raw_evaluation_results.items():
+            for dataset_name, result in model_results.items():
+                json_result = result.describe_json()
+
+                structured_information = {
+                    "model": model_name,
+                    "dataset": dataset_name,
+                    "accuracy": round(json_result["accuracy"], 4),
+                    "accuracy_std": round(json_result["accuracy_std"], 4),
+                    "hamming_loss": round(json_result["hamming_loss"], 4),
+                    "hamming_loss_std": round(json_result["hamming_loss_std"], 4),
+                    "f1": round(json_result["f1"], 4),
+                    "f1_std": round(json_result["f1_std"], 4),
+                }
+                results.append(structured_information)
+
+        return results
