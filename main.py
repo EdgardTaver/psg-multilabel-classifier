@@ -27,18 +27,18 @@ def build_repository() -> MetricsPipelineRepository:
 def build_dataset_loader() -> DatasetsLoader:
     return DatasetsLoader([
         # [done] fast datasets
-        "birds",
-        "emotions",
-        "scene",
+        # "birds",
+        # "emotions",
+        # "scene",
         
         # [done] not so fast datasets
-        "yeast", 
-        "enron", 
-        "genbase", 
-        "medical", 
+        # "yeast", 
+        # "enron", 
+        # "genbase", 
+        # "medical", 
 
         # [done] slow datasets
-        # "tmc2007_500", 
+        "tmc2007_500", 
 
         # impossibly slow datasets
         # "delicious",
