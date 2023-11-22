@@ -38,7 +38,7 @@ def build_dataset_loader() -> DatasetsLoader:
         # "medical", 
 
         # [done] slow datasets
-        "tmc2007_500", 
+        # "tmc2007_500", 
 
         # impossibly slow datasets
         # "delicious",
