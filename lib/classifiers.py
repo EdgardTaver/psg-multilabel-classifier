@@ -260,8 +260,6 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
         # therefore, we have to return the inverse of the hamming loss
 
     def test_ordering(self, solution: List[int]):
-        print(f"testing order: {solution}")
-
         classifier = PatchedClassifierChain(
             base_classifier=copy.deepcopy(self.base_classifier),
             order=solution,
