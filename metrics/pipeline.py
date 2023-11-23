@@ -37,7 +37,7 @@ class MetricsPipeline:
         evaluation_index = 0
 
         for model_name, model in self.models.items():
-            n_folds = 10
+            n_folds = 5
             evaluation_pipeline = EvaluationPipeline(model, n_folds)
 
             for dataset_name, info in datasets.items():
