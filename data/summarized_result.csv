@@ -1,14 +1,4 @@
 model,dataset,accuracy,accuracy_std,hamming_loss,hamming_loss_std,f1,f1_std
-baseline_binary_relevance_model_svc_123,scene,0.491,0.208,-0.1107,0.0473,0.3016,0.0906
-baseline_binary_relevance_model_svc_123,birds,0.4637,0.0677,-0.0535,0.0076,0.0126,0.0089
-baseline_binary_relevance_model_svc_456,scene,0.491,0.208,-0.1107,0.0473,0.3016,0.0906
-baseline_binary_relevance_model_svc_456,birds,0.4637,0.0677,-0.0535,0.0076,0.0126,0.0089
-baseline_binary_relevance_model_rfc_123,scene,0.4482,0.2225,-0.1131,0.0473,0.2724,0.0913
-baseline_binary_relevance_model_rfc_123,birds,0.5227,0.0652,-0.0398,0.0063,0.2146,0.0436
-baseline_binary_relevance_model_rfc_456,scene,0.4507,0.2209,-0.1127,0.0477,0.277,0.0927
-baseline_binary_relevance_model_rfc_456,birds,0.5305,0.0719,-0.0397,0.0062,0.2127,0.0439
-baseline_binary_relevance_model_knn,scene,0.5352,0.1397,-0.1254,0.0437,0.2744,0.0451
-baseline_binary_relevance_model_knn,birds,0.4606,0.0716,-0.0578,0.0095,0.0537,0.0224
 baseline_binary_relevance_model,birds,0.4606,0.0716,-0.0578,0.0095,0.0537,0.0224
 baseline_binary_relevance_model,emotions,0.1787,0.0336,-0.273,0.0145,0.4734,0.0272
 baseline_binary_relevance_model,scene,0.5352,0.1397,-0.1254,0.0437,0.2744,0.0451
