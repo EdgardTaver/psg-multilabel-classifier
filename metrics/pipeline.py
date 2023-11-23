@@ -112,16 +112,24 @@ class DatasetsLoader:
 
         return self.loaded_datasets
 
-    def describe(self) -> None:
+    def describe_log(self) -> None:
+        results = self.describe_json()
+        for result in results:
+            logging.info(f"information for dataset: {result}")
+
+    def describe_json(self) -> List[Dict[str, Any]]:
+        results = []
+
         for name, info in self.loaded_datasets.items():
-            structured_log = {
+            structured_information = {
                 "dataset": name,
                 "rows": info["rows"],
                 "features_count": info["features_count"],
                 "labels_count": info["labels_count"],
             }
-
-            logging.info(f"information for dataset: {structured_log}")
+            results.append(structured_information)
+        
+        return results
 
 
 class MetricsPipelineRepository:

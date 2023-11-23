@@ -1,0 +1,9 @@
+dataset,rows,features_count,labels_count
+birds,645,260,19
+emotions,593,72,6
+scene,2407,294,6
+yeast,2417,103,14
+enron,1702,1001,53
+genbase,662,1186,27
+medical,978,1449,45
+tmc2007_500,28596,500,22

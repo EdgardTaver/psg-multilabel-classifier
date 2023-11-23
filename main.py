@@ -113,7 +113,7 @@ def build_models_list() -> Dict[str, Any]:
         ),
     }
 
-
+DATASETS_INFO_TO_CSV = "datasets_info_to_csv"
 DESCRIBE_DATASETS = "describe_datasets"
 DESCRIBE_METRICS = "describe_metrics"
 METRICS_TO_CSV = "metrics_to_csv"
@@ -127,7 +127,13 @@ if __name__ == "__main__":
         "task",
         default=DESCRIBE_DATASETS,
         help="action to be executed",
-        choices=[DESCRIBE_DATASETS, DESCRIBE_METRICS, METRICS_TO_CSV, RUN_MODELS],
+        choices=[
+            DATASETS_INFO_TO_CSV,
+            DESCRIBE_DATASETS,
+            DESCRIBE_METRICS,
+            METRICS_TO_CSV,
+            RUN_MODELS,
+        ],
         action="store")
     
     args = parser.parse_args()
@@ -138,7 +144,14 @@ if __name__ == "__main__":
 
     if args.task == DESCRIBE_DATASETS:
         loader.load()
-        loader.describe()
+        loader.describe_log()
+    
+    if args.task == DATASETS_INFO_TO_CSV:
+        loader.load()
+        result = loader.describe_json()
+
+        df = pd.DataFrame(result)
+        df.to_csv("./data/datasets_info.csv", index=False)
     
     if args.task == DESCRIBE_METRICS:
         repository.load_from_file()
