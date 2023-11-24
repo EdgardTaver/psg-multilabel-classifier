@@ -164,8 +164,8 @@ class PatchedClassifierChain(MultiLabelClassifier):
         label_count = y.shape[1]
         if len(self.order) == 0:
             self.order = np.arange(label_count)
-        elif label_count != len(self.order):
-            raise Exception("provided order does not match the label count")
+        # elif label_count != len(self.order):
+        #     raise Exception("provided order does not match the label count")
 
         self.classifiers = {}
         # using a dict instead of a list as the index has to be the label following the custom order
