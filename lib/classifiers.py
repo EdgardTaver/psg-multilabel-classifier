@@ -1,6 +1,7 @@
 import copy
 import math
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, List, Optional, cast
+import logging
 
 import numpy as np
 import pandas as pd
@@ -157,6 +158,10 @@ class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
         
         f_test_ordering = build_chain_based_on_f_test(
             self.calculator.get(y), self.ascending_chain)
+    
+        logging.warn(f"chain ordering: {f_test_ordering}")
+        logging.warn(f"chain size: {len(f_test_ordering)}")
+        logging.warn(f"y shape: {y.shape}")
         
         self.main_classifier = PatchedClassifierChain(
             base_classifier=self.base_classifier,
