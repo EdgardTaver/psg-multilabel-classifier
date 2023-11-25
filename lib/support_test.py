@@ -8,8 +8,10 @@ from lib.support import (CalculateLabelsCorrelationWithFTest,
                          ConditionalEntropies, MutualInformation,
                          build_chain_based_on_f_test)
 
+from scipy import sparse
 
-def test_calculate_labels_correlation_with_f_test():
+
+def test_calculate_labels_correlation_with_f_test_regular():
     train_data = load_dataset("scene", "train")
     _, y_train, _, _ = train_data
 
@@ -22,6 +24,21 @@ def test_calculate_labels_correlation_with_f_test():
     expected = pd.read_csv(f)
 
     expect_data_frames_to_be_equal(exercise, expected)
+
+def test_calculate_labels_correlation_with_f_test_specific_dataset():
+    f = os.path.join("test_data", "y_situation_specific_for_f_test.csv")
+    y_specific = pd.read_csv(f)
+    label_count = y_specific.shape[1]
+
+    ccf = CalculateLabelsCorrelationWithFTest(alpha=1)
+    exercise = ccf.get(sparse.csr_matrix(y_specific.values))
+
+    for label in exercise["for_label"].unique():
+        check = exercise["for_label"] == label
+        msg = f"for label {label} there should be {label_count-1} rows, but there are {check.sum()}"
+        
+        assert check.sum() == label_count-1, msg
+
 
 def test_calculate_conditional_entropies():
     train_data = load_dataset("scene", "train")
