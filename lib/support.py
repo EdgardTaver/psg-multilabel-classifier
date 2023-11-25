@@ -44,13 +44,14 @@ class CalculateLabelsCorrelationWithFTest:
                 y = labels.todense()[:, j]
                 against_label = self.convert_matrix_to_vector(y)
 
-                f_test_result = f_classif(base_label, against_label)[0]
+                f_test_result = f_classif(base_label, against_label)[0][0]
+                f_test_result = np.round(f_test_result, 8)
 
                 results.append(
                     {
                         "label_being_tested": i,
                         "against_label": j,
-                        "f_test_result": float(f_test_result),
+                        "f_test_result": f_test_result,
                     }
                 )
 
@@ -76,14 +77,18 @@ class CalculateLabelsCorrelationWithFTest:
             mask = sorted_f_test_results["label_being_tested"] == i
             split_df = sorted_f_test_results[mask].reset_index(drop=True)
 
-            big_f = split_df["f_test_result"].sum()
-            max_cum_f = self.alpha * big_f
+            big_f = np.round(split_df["f_test_result"].sum(), 8)
+            max_cum_f = np.round(self.alpha * big_f, 8)
 
             cum_f = 0
             for _, row in split_df.iterrows():
                 cum_f += row["f_test_result"]
+                cum_f = np.round(cum_f, 8)
+                # these rounding operations are necessary because of the
+                # floating point arithmetic
+
                 if cum_f > max_cum_f:
-                    break
+                   break
 
                 selected_features.append(
                     {
