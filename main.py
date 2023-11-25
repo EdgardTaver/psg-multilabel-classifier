@@ -23,7 +23,8 @@ def setup_logging() -> None:
 
 
 def build_repository() -> MetricsPipelineRepository:
-    PIPELINE_RESULTS_FILE = "./data/metrics_debugging.csv"
+    PIPELINE_RESULTS_FILE = "./data/metrics_rfc.csv"
+    # PIPELINE_RESULTS_FILE = "./data/metrics.csv"
     return MetricsPipelineRepository(PIPELINE_RESULTS_FILE)
 
 
@@ -31,17 +32,17 @@ def build_dataset_loader() -> DatasetsLoader:
     return DatasetsLoader([
         # [done] fast datasets
         "birds",
-        # "emotions",
-        # "scene",
+        "emotions",
+        "scene",
         
         # [done] not so fast datasets
-        # "yeast", 
-        # "enron", 
-        # "genbase", 
-        # "medical", 
+        "yeast", 
+        "enron", 
+        "genbase", 
+        "medical", 
 
         # [done] slow datasets
-        # "tmc2007_500", 
+        "tmc2007_500", 
 
         # impossibly slow datasets
         # "delicious",
@@ -51,67 +52,67 @@ def build_dataset_loader() -> DatasetsLoader:
 
 def build_models_list() -> Dict[str, Any]:
     return {
-        # "baseline_binary_relevance_model": BinaryRelevance(
-        #     classifier=RandomForestClassifier(random_state=42),
-        #     require_dense=[False, True]
-        # ),
-        # "baseline_stacked_generalization": StackedGeneralization(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        # ),
-        # "baseline_dependant_binary_relevance": DependantBinaryRelevance(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        # ),
-        # "baseline_classifier_chain": PatchedClassifierChain(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        # ),
-        # "stacking_with_f_tests-alpha=0.25": StackingWithFTests(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     alpha=0.25,
-        # ),
-        # "stacking_with_f_tests-alpha=0.50": StackingWithFTests(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     alpha=0.50,
-        # ),
-        # "stacking_with_f_tests-alpha=0.75": StackingWithFTests(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     alpha=0.75,
-        # ),
-        # "classifier_chain_with_f_test_ordering-ascending_chain=False": ClassifierChainWithFTestOrdering(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     ascending_chain=False,
-        # ),
+        "baseline_binary_relevance_model": BinaryRelevance(
+            classifier=RandomForestClassifier(random_state=42),
+            require_dense=[False, True]
+        ),
+        "baseline_stacked_generalization": StackedGeneralization(
+            base_classifier=RandomForestClassifier(random_state=42),
+        ),
+        "baseline_dependant_binary_relevance": DependantBinaryRelevance(
+            base_classifier=RandomForestClassifier(random_state=42),
+        ),
+        "baseline_classifier_chain": PatchedClassifierChain(
+            base_classifier=RandomForestClassifier(random_state=42),
+        ),
+        "stacking_with_f_tests-alpha=0.25": StackingWithFTests(
+            base_classifier=RandomForestClassifier(random_state=42),
+            alpha=0.25,
+        ),
+        "stacking_with_f_tests-alpha=0.50": StackingWithFTests(
+            base_classifier=RandomForestClassifier(random_state=42),
+            alpha=0.50,
+        ),
+        "stacking_with_f_tests-alpha=0.75": StackingWithFTests(
+            base_classifier=RandomForestClassifier(random_state=42),
+            alpha=0.75,
+        ),
+        "classifier_chain_with_f_test_ordering-ascending_chain=False": ClassifierChainWithFTestOrdering(
+            base_classifier=RandomForestClassifier(random_state=42),
+            ascending_chain=False,
+        ),
         "classifier_chain_with_f_test_ordering-ascending_chain=True": ClassifierChainWithFTestOrdering(
             base_classifier=RandomForestClassifier(random_state=42),
             ascending_chain=True,
         ),
-        # "classifier_chain_with_lop-num_generations=10": ClassifierChainWithLOP(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     num_generations=10,
-        # ),
-        # "classifier_chain_with_lop-num_generations=25": ClassifierChainWithLOP(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     num_generations=25,
-        # ),
-        # "classifier_chain_with_lop-num_generations=50": ClassifierChainWithLOP(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     num_generations=50,
-        # ),
-        # "partial_classifier_chain_with_lop-num_generations=10": PartialClassifierChainWithLOP(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     num_generations=10,
-        # ),
-        # "partial_classifier_chain_with_lop-num_generations=25": PartialClassifierChainWithLOP(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     num_generations=25,
-        # ),
-        # "partial_classifier_chain_with_lop-num_generations=50": PartialClassifierChainWithLOP(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     num_generations=50,
-        # ),
-        # "classifier_chain_with_genetic_algorithm-num_generations=5": ClassifierChainWithGeneticAlgorithm(
-        #     base_classifier=RandomForestClassifier(random_state=42),
-        #     num_generations=5,
-        # ),
+        "classifier_chain_with_lop-num_generations=10": ClassifierChainWithLOP(
+            base_classifier=RandomForestClassifier(random_state=42),
+            num_generations=10,
+        ),
+        "classifier_chain_with_lop-num_generations=25": ClassifierChainWithLOP(
+            base_classifier=RandomForestClassifier(random_state=42),
+            num_generations=25,
+        ),
+        "classifier_chain_with_lop-num_generations=50": ClassifierChainWithLOP(
+            base_classifier=RandomForestClassifier(random_state=42),
+            num_generations=50,
+        ),
+        "partial_classifier_chain_with_lop-num_generations=10": PartialClassifierChainWithLOP(
+            base_classifier=RandomForestClassifier(random_state=42),
+            num_generations=10,
+        ),
+        "partial_classifier_chain_with_lop-num_generations=25": PartialClassifierChainWithLOP(
+            base_classifier=RandomForestClassifier(random_state=42),
+            num_generations=25,
+        ),
+        "partial_classifier_chain_with_lop-num_generations=50": PartialClassifierChainWithLOP(
+            base_classifier=RandomForestClassifier(random_state=42),
+            num_generations=50,
+        ),
+        "classifier_chain_with_genetic_algorithm-num_generations=5": ClassifierChainWithGeneticAlgorithm(
+            base_classifier=RandomForestClassifier(random_state=42),
+            num_generations=5,
+        ),
     }
 
 DATASETS_INFO_TO_CSV = "datasets_info_to_csv"
