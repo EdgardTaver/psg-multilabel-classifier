@@ -22,7 +22,8 @@ def setup_logging() -> None:
     logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
 
 
-BASE_FILE_NAME = "rfc_n_folds=5"
+N_FOLDS = 5
+BASE_FILE_NAME = f"rfc_n_folds={N_FOLDS}"
 PIPELINE_RESULTS_FILE = f"./data/metrics_{BASE_FILE_NAME}.csv"
 SUMMARIZED_RESULTS_FILE = f"./data/summarized_result_{BASE_FILE_NAME}.csv"
 
@@ -169,5 +170,5 @@ if __name__ == "__main__":
         df.to_csv(SUMMARIZED_RESULTS_FILE, index=False)
 
     if args.task == RUN_MODELS:
-        pipe = MetricsPipeline(repository, loader, models)
+        pipe = MetricsPipeline(repository, loader, models, N_FOLDS)
         pipe.run()

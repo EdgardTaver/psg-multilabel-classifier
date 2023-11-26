@@ -17,10 +17,12 @@ class MetricsPipeline:
         repository: "MetricsPipelineRepository",
         datasets_loader: "DatasetsLoader",
         models: Dict[str, Any],
+        n_folds: int,
     ) -> None:
         self.repository = repository
         self.datasets_loader = datasets_loader
         self.models = models
+        self.n_folds = n_folds
 
     def run(self):
         logging.info("pipeline: getting metrics for all the models")
@@ -37,8 +39,7 @@ class MetricsPipeline:
         evaluation_index = 0
 
         for model_name, model in self.models.items():
-            n_folds = 10
-            evaluation_pipeline = EvaluationPipeline(model, n_folds)
+            evaluation_pipeline = EvaluationPipeline(model, self.n_folds)
 
             for dataset_name, info in datasets.items():
                 evaluation_index += 1
@@ -46,7 +47,7 @@ class MetricsPipeline:
                 log_fields = {
                     "model": model_name,
                     "dataset": dataset_name,
-                    "n_folds": n_folds,
+                    "n_folds": self.n_folds,
                     "evaluation_index": evaluation_index,
                     "total_evaluations": total_evaluations,
                 }
