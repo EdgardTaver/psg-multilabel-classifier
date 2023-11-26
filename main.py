@@ -22,9 +22,11 @@ def setup_logging() -> None:
     logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
 
 
+BASE_FILE_NAME = "rfc_n_folds=5"
+PIPELINE_RESULTS_FILE = f"./data/metrics_{BASE_FILE_NAME}.csv"
+SUMMARIZED_RESULTS_FILE = f"./data/summarized_result_{BASE_FILE_NAME}.csv"
+
 def build_repository() -> MetricsPipelineRepository:
-    PIPELINE_RESULTS_FILE = "./data/metrics_rfc.csv"
-    # PIPELINE_RESULTS_FILE = "./data/metrics.csv"
     return MetricsPipelineRepository(PIPELINE_RESULTS_FILE)
 
 
@@ -42,7 +44,7 @@ def build_dataset_loader() -> DatasetsLoader:
         "medical", 
 
         # [done] slow datasets
-        "tmc2007_500", 
+        # "tmc2007_500", 
 
         # impossibly slow datasets
         # "delicious",
@@ -109,10 +111,10 @@ def build_models_list() -> Dict[str, Any]:
             base_classifier=RandomForestClassifier(random_state=42),
             num_generations=50,
         ),
-        "classifier_chain_with_genetic_algorithm-num_generations=5": ClassifierChainWithGeneticAlgorithm(
-            base_classifier=RandomForestClassifier(random_state=42),
-            num_generations=5,
-        ),
+        # "classifier_chain_with_genetic_algorithm-num_generations=5": ClassifierChainWithGeneticAlgorithm(
+        #     base_classifier=RandomForestClassifier(random_state=42),
+        #     num_generations=5,
+        # ),
     }
 
 DATASETS_INFO_TO_CSV = "datasets_info_to_csv"
@@ -164,7 +166,7 @@ if __name__ == "__main__":
         result = repository.describe_dict()
 
         df = pd.DataFrame(result)
-        df.to_csv("./data/summarized_result.csv", index=False)
+        df.to_csv(SUMMARIZED_RESULTS_FILE, index=False)
 
     if args.task == RUN_MODELS:
         pipe = MetricsPipeline(repository, loader, models)
