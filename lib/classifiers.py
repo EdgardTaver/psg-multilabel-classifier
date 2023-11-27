@@ -24,7 +24,7 @@ from lib.base_models import PatchedClassifierChain, PartialClassifierChains
 
 class StackingWithFTests(MultiLabelClassifier):
     """
-    Implementation according to this paper:
+    Implementation following this paper:
 
     Chen, Y.-N., Weng, W., Wu, S.-X., Chen, B.-H., Fan, Y.-L., Liu, J.-H.
     "An efficient stacking model with label selection for multi-label classification"
@@ -127,7 +127,7 @@ class StackingWithFTests(MultiLabelClassifier):
     
 class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
     """
-    Trains a ClassifierChain using the labels correlation calculated with F-Test
+    Trains a `ClassifierChain` using the labels correlation calculated with F-Test
     to determine the order of the labels in the chain.
 
     Arguments:
@@ -193,6 +193,18 @@ class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
 
 
 class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
+    """
+    Inspired by the implementation found in this paper:
+
+    Mishra, N.K.; Singh P. K.
+    "Linear Ordering Problem based Classifier Chain using Genetic Algorithm for multi-label classification"
+
+    However, the paper proposes to use the genetic algorithm to solve a linear
+    ordering problem, and the ordering emerges from the solution. This implementation
+    uses the genetic algorithm to test different orderings directly, and the best
+    ordering is used to build a `ClassifierChain`.
+    """
+
     def __init__(
         self,
         base_classifier: Any,
@@ -303,6 +315,7 @@ class ClassifierChainWithGeneticAlgorithm(MultiLabelClassifier):
 
 class LOPSolver:
     # TODO: this could be organized as a Mixin class
+    
     def model_fitness_func(
         self, ga_instance: Any, solution: Any, solution_idx: Any
     ) -> float:
@@ -351,6 +364,13 @@ class LOPSolver:
 
 
 class ClassifierChainWithLOP(MultiLabelClassifier, LOPSolver):
+    """
+    Implementation following this paper:
+
+    Mishra, N.K.; Singh P. K.
+    "Linear Ordering Problem based Classifier Chain using Genetic Algorithm for multi-label classification"
+    """
+
     def __init__(
         self,
         base_classifier: Any,
@@ -421,6 +441,13 @@ class ClassifierChainWithLOP(MultiLabelClassifier, LOPSolver):
 
 
 class PartialClassifierChainWithLOP(MultiLabelClassifier, LOPSolver):
+    """
+    Implementation following this paper:
+
+    Mishra, N.K.; Singh P. K.
+    "Linear Ordering Problem based Classifier Chain using Genetic Algorithm for multi-label classification"
+    """
+
     def __init__(
         self,
         base_classifier: Any,
