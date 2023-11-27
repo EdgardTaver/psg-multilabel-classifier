@@ -66,6 +66,18 @@ class StackedGeneralization(MultiLabelClassifier):
 
 
 class DependantBinaryRelevance(MultiLabelClassifier):
+    """
+    Implementation according to what was seen on this paper:
+
+    Chen, Y.-N., Weng, W., Wu, S.-X., Chen, B.-H., Fan, Y.-L., Liu, J.-H.
+    "An efficient stacking model with label selection for multi-label classification"
+
+    Which cites this other reference whe explaining about this model:
+
+    Godbole S, Sarawagi S (2004). "Discriminative methods for multi-labeled classification".
+    In: Pacific-asia conference on knowledge discovery and data mining. Springer, pp 22–30.
+    """
+    
     first_layer_classifiers: BinaryRelevance
     second_layer_classifiers: List[Any]
 

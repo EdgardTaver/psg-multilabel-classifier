@@ -23,6 +23,13 @@ from lib.base_models import PatchedClassifierChain, PartialClassifierChains
 
 
 class StackingWithFTests(MultiLabelClassifier):
+    """
+    Implementation according to this paper:
+
+    Chen, Y.-N., Weng, W., Wu, S.-X., Chen, B.-H., Fan, Y.-L., Liu, J.-H.
+    "An efficient stacking model with label selection for multi-label classification"
+    """
+
     alpha: float
     use_first_layer_to_calculate_correlations: bool
 
