@@ -13,7 +13,7 @@ from lib.classifiers import (ClassifierChainWithFTestOrdering,
                              ClassifierChainWithGeneticAlgorithm,
                              ClassifierChainWithLOP,
                              PartialClassifierChainWithLOP, StackingWithFTests)
-from metrics.pipeline import (DatasetsLoader, MetricsPipeline,
+from metrics.pipeline import (DatasetsLoader, DatasetsLoaderNormalized, MetricsPipeline,
                               MetricsPipelineRepository)
 
 
@@ -23,7 +23,7 @@ def setup_logging() -> None:
 
 
 N_FOLDS = 10
-BASE_FILE_NAME = f"rfc_n_folds={N_FOLDS}"
+BASE_FILE_NAME = f"knn_normalized_n_folds={N_FOLDS}"
 PIPELINE_RESULTS_FILE = f"./data/metrics_{BASE_FILE_NAME}.csv"
 SUMMARIZED_RESULTS_FILE = f"./data/summarized_result_{BASE_FILE_NAME}.csv"
 
@@ -31,8 +31,8 @@ def build_repository() -> MetricsPipelineRepository:
     return MetricsPipelineRepository(PIPELINE_RESULTS_FILE)
 
 
-def build_dataset_loader() -> DatasetsLoader:
-    return DatasetsLoader([
+def build_dataset_loader() -> DatasetsLoaderNormalized:
+    return DatasetsLoaderNormalized([
         # [done] fast datasets
         "birds",
         "emotions",
@@ -56,64 +56,64 @@ def build_dataset_loader() -> DatasetsLoader:
 def build_models_list() -> Dict[str, Any]:
     return {
         "baseline_binary_relevance_model": BinaryRelevance(
-            classifier=RandomForestClassifier(random_state=42),
+            classifier=KNeighborsClassifier(),
             require_dense=[False, True]
         ),
         "baseline_stacked_generalization": StackedGeneralization(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
         ),
         "baseline_dependant_binary_relevance": DependantBinaryRelevance(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
         ),
         "baseline_classifier_chain": PatchedClassifierChain(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
         ),
         "stacking_with_f_tests-alpha=0.25": StackingWithFTests(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             alpha=0.25,
         ),
         "stacking_with_f_tests-alpha=0.50": StackingWithFTests(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             alpha=0.50,
         ),
         "stacking_with_f_tests-alpha=0.75": StackingWithFTests(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             alpha=0.75,
         ),
         "classifier_chain_with_f_test_ordering-ascending_chain=False": ClassifierChainWithFTestOrdering(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             ascending_chain=False,
         ),
         "classifier_chain_with_f_test_ordering-ascending_chain=True": ClassifierChainWithFTestOrdering(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             ascending_chain=True,
         ),
         "classifier_chain_with_lop-num_generations=10": ClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=10,
         ),
         "classifier_chain_with_lop-num_generations=25": ClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=25,
         ),
         "classifier_chain_with_lop-num_generations=50": ClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=50,
         ),
         "partial_classifier_chain_with_lop-num_generations=10": PartialClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=10,
         ),
         "partial_classifier_chain_with_lop-num_generations=25": PartialClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=25,
         ),
         "partial_classifier_chain_with_lop-num_generations=50": PartialClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=50,
         ),
         # "classifier_chain_with_genetic_algorithm-num_generations=5": ClassifierChainWithGeneticAlgorithm(
-        #     base_classifier=RandomForestClassifier(random_state=42),
+        #     base_classifier=KNeighborsClassifier(),
         #     num_generations=5,
         # ),
     }
