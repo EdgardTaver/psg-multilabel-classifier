@@ -3,6 +3,7 @@ import os
 from typing import Any, Dict, List
 
 import pandas as pd
+from sklearn.preprocessing import MaxAbsScaler
 from skmultilearn.dataset import load_dataset
 
 from metrics.evaluation import EvaluationPipeline, EvaluationPipelineResult
@@ -131,6 +132,31 @@ class DatasetsLoader:
             results.append(structured_information)
         
         return results
+    
+class DatasetsLoaderNormalized(DatasetsLoader):
+    def load(self) -> None:
+        self.loaded_datasets = {}
+
+        for dataset_name in self.dataset_names:
+            print(f"getting dataset `{dataset_name}`")
+            
+            full_dataset = load_dataset(dataset_name, "undivided")
+            if full_dataset is None:
+                raise Exception(f"dataset `{dataset_name}` not found")
+            X, y, _, _ = full_dataset
+
+            scaler = MaxAbsScaler()
+            X = scaler.fit_transform(X)
+
+            self.loaded_datasets[dataset_name] = {
+                "X": X,
+                "y": y,
+                "rows": X.shape[0],
+                "features_count": X.shape[1],
+                "labels_count": y.shape[1]
+            }
+
+        logging.info("finished getting all datasets")
 
 
 class MetricsPipelineRepository:
