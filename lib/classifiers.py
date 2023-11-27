@@ -139,6 +139,14 @@ class ClassifierChainWithFTestOrdering(MultiLabelClassifier):
             - default behavior is False.
 
         `base_classifier`: the classifier to be used as the base for the chain.
+    
+    Inspired by the implementation found in this paper:
+
+    Chen, Y.-N., Weng, W., Wu, S.-X., Chen, B.-H., Fan, Y.-L., Liu, J.-H.
+    "An efficient stacking model with label selection for multi-label classification"
+
+    However, the paper proposes to use a stacking model, whereas this implementation
+    uses a classifier chain.
     """
 
     def __init__(
