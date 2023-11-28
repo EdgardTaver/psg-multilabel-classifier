@@ -22,7 +22,7 @@ def setup_logging() -> None:
     logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
 
 
-N_FOLDS = 5
+N_FOLDS = 10
 BASE_FILE_NAME = f"knn_normalized_n_folds={N_FOLDS}"
 PIPELINE_RESULTS_FILE = f"./data/metrics_{BASE_FILE_NAME}.csv"
 SUMMARIZED_RESULTS_FILE = f"./data/summarized_result_{BASE_FILE_NAME}.csv"
@@ -45,7 +45,7 @@ def build_dataset_loader() -> DatasetsLoaderNormalized:
         "medical",
 
         # [done] slow datasets
-        # "tmc2007_500",
+        "tmc2007_500",
 
         # impossibly slow datasets
         # "delicious",
