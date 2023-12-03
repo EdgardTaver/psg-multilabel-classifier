@@ -117,13 +117,21 @@ def calculate_best_awards(models_to_datasets_matrix: pd.DataFrame) -> pd.DataFra
     return df
 
 def calculate_ranking(models_to_datasets_matrix: pd.DataFrame) -> pd.DataFrame:
+    """
+    Generates a rank for each model, based on its performance in each dataset.
+    The lower the value, the better the model.
+
+    A final column is added to the data frame, `rank_average`,
+    which is the average of all `rank_{dataset_name}` columns.
+    """
+
     df = models_to_datasets_matrix.copy()
 
     for dataset_name in ALL_DATASETS:
         df[f"rank_{dataset_name}"] = df[dataset_name].rank(method="min", ascending=False)
     
     rank_cols = [col for col in df.columns if "rank_" in col]
-    df["rank_sum"] = df[rank_cols].mean(axis=1)
+    df["rank_average"] = df[rank_cols].mean(axis=1)
 
-    df = df.sort_values(by="rank_sum", ascending=True)
+    df = df.sort_values(by="rank_average", ascending=True)
     return df
