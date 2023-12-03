@@ -28,6 +28,7 @@ N_FOLDS = 10
 BASE_FILE_NAME = f"knn_normalized_n_folds={N_FOLDS}"
 PIPELINE_RESULTS_FILE = f"./data/metrics_{BASE_FILE_NAME}.csv"
 SUMMARIZED_RESULTS_FILE = f"./data/summarized_result_{BASE_FILE_NAME}.csv"
+RANKED_FILE_NAME = "./data/ranked_for_{score_name}.csv"
 
 def build_repository() -> MetricsPipelineRepository:
     return MetricsPipelineRepository(PIPELINE_RESULTS_FILE)
@@ -47,7 +48,7 @@ def build_dataset_loader() -> DatasetsLoaderNormalized:
         "medical",
 
         # [done] slow datasets
-        # "tmc2007_500",
+        "tmc2007_500",
 
         # impossibly slow datasets
         # "delicious",
@@ -200,7 +201,7 @@ if __name__ == "__main__":
     
     if args.task == SUMMARIZED_METRICS_ANALYSIS:
         df = pd.read_csv(SUMMARIZED_RESULTS_FILE)
-        analyse_summarized_metrics(df)
+        analyse_summarized_metrics(df, RANKED_FILE_NAME)
     
     if args.task == RUN_MODELS:
         pipe = MetricsPipeline(repository, loader, models, N_FOLDS)

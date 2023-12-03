@@ -11,7 +11,8 @@ ALL_DATASETS = [
     "tmc2007_500",
 ]
 
-def analyse_summarized_metrics(summarized_metrics: pd.DataFrame) -> pd.DataFrame:
+
+def analyse_summarized_metrics(summarized_metrics: pd.DataFrame, ranked_file_name: str) -> pd.DataFrame:
     analysis = summarized_metrics.copy()
 
     analysis["model_name"] = analysis["model"].apply(lambda x: x.split("-")[0])
@@ -86,10 +87,8 @@ def analyse_summarized_metrics(summarized_metrics: pd.DataFrame) -> pd.DataFrame
     
         transposed_for_score = pd.DataFrame(transformed_rows)
         best_for_score = calculate_best_awards(transposed_for_score)
-        best_for_score.to_csv(f"./data/best_for_{score_name}.csv", index=False)
-
-        ranked_best_for_score = calculate_ranking(best_for_score)
-        ranked_best_for_score.to_csv(f"./data/ranked_best_for_{score_name}.csv", index=False)
+        ranked_for_score = calculate_ranking(best_for_score)
+        ranked_for_score.to_csv(ranked_file_name.format(score_name=score_name), index=False)
 
 
 def calculate_best_awards(models_to_datasets_matrix: pd.DataFrame) -> pd.DataFrame:
@@ -135,3 +134,4 @@ def calculate_ranking(models_to_datasets_matrix: pd.DataFrame) -> pd.DataFrame:
 
     df = df.sort_values(by="rank_average", ascending=True)
     return df
+
