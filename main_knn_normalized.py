@@ -16,6 +16,8 @@ from lib.classifiers import (ClassifierChainWithFTestOrdering,
 from metrics.pipeline import (DatasetsLoader, DatasetsLoaderNormalized, MetricsPipeline,
                               MetricsPipelineRepository)
 
+from metrics.analysis import analyse_summarized_metrics
+
 
 def setup_logging() -> None:
     LOGGING_FORMAT="%(asctime)s | %(levelname)s | %(message)s"
@@ -147,6 +149,7 @@ DATASETS_INFO_TO_CSV = "datasets_info_to_csv"
 DESCRIBE_DATASETS = "describe_datasets"
 DESCRIBE_METRICS = "describe_metrics"
 METRICS_TO_CSV = "metrics_to_csv"
+SUMMARIZED_METRICS_ANALYSIS = "summarized_metrics_analysis"
 RUN_MODELS = "run_models"
 
 if __name__ == "__main__":
@@ -163,6 +166,7 @@ if __name__ == "__main__":
             DESCRIBE_METRICS,
             METRICS_TO_CSV,
             RUN_MODELS,
+            SUMMARIZED_METRICS_ANALYSIS,
         ],
         action="store")
     
@@ -193,7 +197,11 @@ if __name__ == "__main__":
 
         df = pd.DataFrame(result)
         df.to_csv(SUMMARIZED_RESULTS_FILE, index=False)
-
+    
+    if args.task == SUMMARIZED_METRICS_ANALYSIS:
+        df = pd.read_csv(SUMMARIZED_RESULTS_FILE)
+        analyse_summarized_metrics(df)
+    
     if args.task == RUN_MODELS:
         pipe = MetricsPipeline(repository, loader, models, N_FOLDS)
         pipe.run()
