@@ -14,6 +14,7 @@ def analyse_summarized_metrics(summarized_metrics: pd.DataFrame) -> pd.DataFrame
     all_datasets = analysis["dataset"].unique()
     best_models = {}
 
+    # finds best model setup for each model and each dataset
     for score_name in scores:
         best_models[score_name] = []
         
@@ -43,8 +44,10 @@ def analyse_summarized_metrics(summarized_metrics: pd.DataFrame) -> pd.DataFrame
                     f"{score_name}_std": analysis_slice[f"{score_name}_std"].iloc[0],
                 })
     
+    # will check the best model across all datasets
+    # one check for each metric
     for score_name in scores:
-        best_acc = pd.DataFrame(best_models[score_name])
+        best_for_score = pd.DataFrame(best_models[score_name])
 
         count_of_datasets = len(all_datasets)
         current_counter = 0
@@ -52,7 +55,7 @@ def analyse_summarized_metrics(summarized_metrics: pd.DataFrame) -> pd.DataFrame
         transformed_rows = []
         actual_row = {}
 
-        for i, row in best_acc.iterrows():
+        for i, row in best_for_score.iterrows():
             dataset_name = row["dataset"]
 
             if current_counter == count_of_datasets:
@@ -71,18 +74,18 @@ def analyse_summarized_metrics(summarized_metrics: pd.DataFrame) -> pd.DataFrame
             
             current_counter += 1
     
-        t = pd.DataFrame(transformed_rows)
+        transposed = pd.DataFrame(transformed_rows)
         for dataset_name in all_datasets:
-            max_for_dataset = t.max()[dataset_name]
+            max_for_dataset = transposed.max()[dataset_name]
 
-            mask = t[dataset_name] == max_for_dataset
+            mask = transposed[dataset_name] == max_for_dataset
 
-            t[f"best_{dataset_name}"] = 0
-            t.loc[mask, f"best_{dataset_name}"] = 1
+            transposed[f"best_{dataset_name}"] = 0
+            transposed.loc[mask, f"best_{dataset_name}"] = 1
 
-        best_cols = [col for col in t.columns if "best_" in col]
-        t["best_awards"] = t[best_cols].sum(axis=1)
+        best_cols = [col for col in transposed.columns if "best_" in col]
+        transposed["best_awards"] = t[best_cols].sum(axis=1)
 
-        t.to_csv(f"./data/best_for_{score_name}.csv", index=False)
+        transposed.to_csv(f"./data/best_for_{score_name}.csv", index=False)
 
 
