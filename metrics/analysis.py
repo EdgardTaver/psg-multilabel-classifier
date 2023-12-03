@@ -84,8 +84,6 @@ def analyse_summarized_metrics(summarized_metrics: pd.DataFrame) -> pd.DataFrame
             transposed.loc[mask, f"best_{dataset_name}"] = 1
 
         best_cols = [col for col in transposed.columns if "best_" in col]
-        transposed["best_awards"] = t[best_cols].sum(axis=1)
+        transposed["best_awards"] = transposed[best_cols].sum(axis=1)
 
         transposed.to_csv(f"./data/best_for_{score_name}.csv", index=False)
-
-
