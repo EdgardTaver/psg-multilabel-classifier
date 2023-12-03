@@ -88,6 +88,9 @@ def analyse_summarized_metrics(summarized_metrics: pd.DataFrame) -> pd.DataFrame
         best_for_score = calculate_best_awards(transposed_for_score)
         best_for_score.to_csv(f"./data/best_for_{score_name}.csv", index=False)
 
+        ranked_best_for_score = calculate_ranking(best_for_score)
+        ranked_best_for_score.to_csv(f"./data/ranked_best_for_{score_name}.csv", index=False)
+
 
 def calculate_best_awards(models_to_datasets_matrix: pd.DataFrame) -> pd.DataFrame:
     """
@@ -111,4 +114,16 @@ def calculate_best_awards(models_to_datasets_matrix: pd.DataFrame) -> pd.DataFra
     best_cols = [col for col in df.columns if "best_" in col]
     df["best_awards"] = df[best_cols].sum(axis=1)
 
+    return df
+
+def calculate_ranking(models_to_datasets_matrix: pd.DataFrame) -> pd.DataFrame:
+    df = models_to_datasets_matrix.copy()
+
+    for dataset_name in ALL_DATASETS:
+        df[f"rank_{dataset_name}"] = df[dataset_name].rank(method="min", ascending=False)
+    
+    rank_cols = [col for col in df.columns if "rank_" in col]
+    df["rank_sum"] = df[rank_cols].mean(axis=1)
+
+    df = df.sort_values(by="rank_sum", ascending=True)
     return df
