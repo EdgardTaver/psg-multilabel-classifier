@@ -33,7 +33,6 @@ TABLE_TEMPLATE = """
         
         {content}
 
-        \hline
         \end{{tabular}}
 	\label{{tab:metricsFor{score_name_camel_case}_{n}}}
   \source{{Edgard Taver, 2023}}
@@ -49,6 +48,10 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
 
         raw_std = str(row[dataset_name_std])
         brazilian_std = raw_std.replace(".", ",").ljust(6, "0")
+
+        if score_name == "hamming_loss":
+            brazilian_value = brazilian_value.replace("-", "")
+            brazilian_std = brazilian_std.replace("-", "")
 
         best_dataset_name = f"best_{dataset_name}"
         if row[best_dataset_name] == 1:
@@ -83,6 +86,7 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
     # the extra "\\" at the end is to ensure some space between the lines
 
     header = "\hline\n{model_col} & {data_1} & {data_2} & {data_3} & {data_4} & {data_5} \\\\ \n\hline \\\\"
+    footer = "\hline \\ \n {diff_coll} & {diff_1} & {diff_2} & {diff_3} & {diff_4} & {diff_5} \\\\ \n\hline \\\\"
 
     header_for_first_part = header.format(
         model_col="Modelo",
@@ -91,6 +95,22 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
         data_3=italic(safe_underscore(datasets_for_first_part[2])),
         data_4=italic(safe_underscore(datasets_for_first_part[3])),
         data_5=italic(safe_underscore(datasets_for_first_part[4])),
+    )
+
+    def get_diff(dataset: str):
+        max_ = ranked_metrics[dataset].max()
+        min_ = ranked_metrics[dataset].min()
+
+        diff_ = str(round(max_ - min_, 4))
+        return diff_.replace(".", ",").ljust(6, "0")
+
+    footer_for_first_part = footer.format(
+        diff_coll="Diferença",
+        diff_1=get_diff(datasets_for_first_part[0]),
+        diff_2=get_diff(datasets_for_first_part[1]),
+        diff_3=get_diff(datasets_for_first_part[2]),
+        diff_4=get_diff(datasets_for_first_part[3]),
+        diff_5=get_diff(datasets_for_first_part[4]),
     )
 
     lines_for_first_part = []
@@ -114,6 +134,15 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
         data_5=bold("Rank"),
     )
 
+    footer_for_second_part = footer.format(
+        diff_coll="Diferença",
+        diff_1=get_diff(datasets_for_second_part[0]),
+        diff_2=get_diff(datasets_for_second_part[1]),
+        diff_3=get_diff(datasets_for_second_part[2]),
+        diff_4="",
+        diff_5="",
+    )
+
     liner_for_second_part = []
     for i, row in ranked_metrics.iterrows():
         f_line = line.format(
@@ -129,21 +158,25 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
     table_content_1 = header_for_first_part
     table_content_1 += "\n\n"
     table_content_1 += "\n".join(lines_for_first_part)
+    table_content_1 += "\n\n"
+    table_content_1 += footer_for_first_part
     
     table_content_2 = header_for_second_part
     table_content_2 += "\n\n"
     table_content_2 += "\n".join(liner_for_second_part)
+    table_content_2 += "\n\n"
+    table_content_2 += footer_for_second_part
 
     full_table_content_1 = TABLE_TEMPLATE.format(
         score_name=SCORES_TRANSLATION[score_name],
-        score_name_camel_case=score_name,
+        score_name_camel_case=SCORES_CAMEL_CASE[score_name],
         content=table_content_1,
         n=1,
     )
 
     full_table_content_2 = TABLE_TEMPLATE.format(
         score_name=SCORES_TRANSLATION[score_name],
-        score_name_camel_case=score_name,
+        score_name_camel_case=SCORES_CAMEL_CASE[score_name],
         content=table_content_2,
         n=2,
     )
