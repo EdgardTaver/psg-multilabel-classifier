@@ -13,15 +13,21 @@ MODEL_NAME_MAP = {
 }
 
 SCORES_TRANSLATION = {
-        "accuracy": "acurácia",
-        "hamming_loss": "perda de \\textit{{Hamming}}",
-        "f1": "f1",
+    "accuracy": "acurácia",
+    "hamming_loss": "perda de \\textit{{Hamming}}",
+    "f1": "f1",
+}
+
+SCORES_CAMEL_CASE = {
+    "accuracy": "Accuracy",
+    "hamming_loss": "HammingLoss",
+    "f1": "F1",
 }
 
 TABLE_TEMPLATE = """
 \\begin{{table}}[htbp]
 	\centering
-	\caption{{Resultados obtidos para {score_name}}}
+	\caption{{Resultados obtidos para {score_name} ({n})}}
 		\\begin{{tabular}}
         {{ p{{0.88in}} p{{0.88in}} p{{0.88in}} p{{0.88in}} p{{0.88in}} p{{0.88in}} }}
         
@@ -29,7 +35,7 @@ TABLE_TEMPLATE = """
 
         \hline
         \end{{tabular}}
-	\label{{tab:metricsFor{score_name_en}}}
+	\label{{tab:metricsFor{score_name_camel_case}_{n}}}
   \source{{Edgard Taver, 2023}}
 \end{{table}}
 """
@@ -53,6 +59,9 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
     def italic(text: str) -> str:
         return f"\\textit{{{text}}}"
     
+    def bold(text: str) -> str:
+        return f"\\textbf{{{text}}}"
+    
     def safe_underscore(text: str) -> str:
         return text.replace("_", "\\_")
 
@@ -73,7 +82,7 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
     line = "{model_name} & {value_1} & {value_2} & {value_3} & {value_4} & {value_5} \\\\ \\\\"
     # the extra "\\" at the end is to ensure some space between the lines
 
-    header = "\hline\n{model_col} & {data_1} & {data_2} & {data_3} & {data_4} & {data_5} \\\\ \n\hline"
+    header = "\hline\n{model_col} & {data_1} & {data_2} & {data_3} & {data_4} & {data_5} \\\\ \n\hline \\\\"
 
     header_for_first_part = header.format(
         model_col="Modelo",
@@ -97,12 +106,12 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
         lines_for_first_part.append(f_line)
     
     header_for_second_part = header.format(
-        model_col="",
+        model_col="Modelo",
         data_1=italic(safe_underscore(datasets_for_second_part[0])),
         data_2=italic(safe_underscore(datasets_for_second_part[1])),
         data_3=italic(safe_underscore(datasets_for_second_part[2])),
-        data_4="Vitórias",
-        data_5="Rank",
+        data_4=bold("Vitórias"),
+        data_5=bold("Rank"),
     )
 
     liner_for_second_part = []
@@ -117,19 +126,29 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
         )
         liner_for_second_part.append(f_line)
 
-    table_content = header_for_first_part
-    table_content += "\n\n"
-    table_content += "\n".join(lines_for_first_part)
-    table_content += "\n\n"
-    table_content += header_for_second_part
-    table_content += "\n\n"
-    table_content += "\n".join(liner_for_second_part)
+    table_content_1 = header_for_first_part
+    table_content_1 += "\n\n"
+    table_content_1 += "\n".join(lines_for_first_part)
+    
+    table_content_2 = header_for_second_part
+    table_content_2 += "\n\n"
+    table_content_2 += "\n".join(liner_for_second_part)
 
-    full_table_content = TABLE_TEMPLATE.format(
+    full_table_content_1 = TABLE_TEMPLATE.format(
         score_name=SCORES_TRANSLATION[score_name],
-        score_name_en=score_name,
-        content=table_content,
+        score_name_camel_case=score_name,
+        content=table_content_1,
+        n=1,
+    )
+
+    full_table_content_2 = TABLE_TEMPLATE.format(
+        score_name=SCORES_TRANSLATION[score_name],
+        score_name_camel_case=score_name,
+        content=table_content_2,
+        n=2,
     )
     
     with open(f"./data/table_{score_name}.tex", "w", encoding="utf8") as f:
-        f.write(full_table_content)
+        f.write(full_table_content_1)
+        f.write("\n\n")
+        f.write(full_table_content_2)

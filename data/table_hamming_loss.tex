@@ -1,7 +1,7 @@
 
 \begin{table}[htbp]
 	\centering
-	\caption{Resultados obtidos para perda de \textit{{Hamming}}}
+	\caption{Resultados obtidos para perda de \textit{{Hamming}} (1)}
 		\begin{tabular}
         { p{0.88in} p{0.88in} p{0.88in} p{0.88in} p{0.88in} p{0.88in} }
         
@@ -17,8 +17,22 @@ CC-F & -0,213 \newline ($\sigma$ 0,0142) & \textbf{-0,1204} \newline ($\sigma$ 0
 (B)DBR & -0,2171 \newline ($\sigma$ 0,0177) & -0,1303 \newline ($\sigma$ 0,0450) & -0,212 \newline ($\sigma$ 0,0072) & -0,0504 \newline ($\sigma$ 0,0072) & -0,0653 \newline ($\sigma$ 0,0085) \\ \\
 CC-LOP & -0,2128 \newline ($\sigma$ 0,0217) & -0,1417 \newline ($\sigma$ 0,0505) & -0,2096 \newline ($\sigma$ 0,0060) & -0,0504 \newline ($\sigma$ 0,0098) & -0,0656 \newline ($\sigma$ 0,0082) \\ \\
 
-\hline
- & \textit{genbase} & \textit{medical} & \textit{enron} & Vitórias & Rank \\ 
+        \hline
+        \end{tabular}
+	\label{tab:metricsForhamming_loss_1}
+  \source{Edgard Taver, 2023}
+\end{table}
+
+
+
+\begin{table}[htbp]
+	\centering
+	\caption{Resultados obtidos para perda de \textit{{Hamming}} (2)}
+		\begin{tabular}
+        { p{0.88in} p{0.88in} p{0.88in} p{0.88in} p{0.88in} p{0.88in} }
+        
+        \hline
+Modelo & \textit{genbase} & \textit{medical} & \textit{enron} & \textbf{Vitórias} & \textbf{Rank} \\ 
 \hline
 
 (B)BR & \textbf{-0,0027} \newline ($\sigma$ 0,0018) & -0,0162 \newline ($\sigma$ 0,0029) & -0,0641 \newline ($\sigma$ 0,0095) & 2 & 2,5000 \\ \\
@@ -31,6 +45,6 @@ CC-LOP & -0,0029 \newline ($\sigma$ 0,0019) & -0,017 \newline ($\sigma$ 0,0027) 
 
         \hline
         \end{tabular}
-	\label{tab:metricsForhamming_loss}
+	\label{tab:metricsForhamming_loss_2}
   \source{Edgard Taver, 2023}
 \end{table}
