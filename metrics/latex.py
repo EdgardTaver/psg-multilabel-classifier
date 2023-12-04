@@ -131,5 +131,5 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
         content=table_content,
     )
     
-    with open(f"table_{score_name}.tex", "w", encoding="utf8") as f:
+    with open(f"./data/table_{score_name}.tex", "w", encoding="utf8") as f:
         f.write(full_table_content)
