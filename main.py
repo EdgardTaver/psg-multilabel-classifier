@@ -125,27 +125,27 @@ def build_models_list() -> Dict[str, Any]:
             num_generations=50,
         ),
         "partial_classifier_chain_with_lop-num_generations=10-threshold=0.001": PartialClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=10,
             threshold=0.001,
         ),
         "partial_classifier_chain_with_lop-num_generations=10-threshold=0.01": PartialClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=10,
             threshold=0.01,
         ),
         "partial_classifier_chain_with_lop-num_generations=10-threshold=0.025": PartialClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=10,
             threshold=0.025,
         ),
         "partial_classifier_chain_with_lop-num_generations=10-threshold=0.05": PartialClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=10,
             threshold=0.05,
         ),
         "partial_classifier_chain_with_lop-num_generations=10-threshold=0.1": PartialClassifierChainWithLOP(
-            base_classifier=RandomForestClassifier(random_state=42),
+            base_classifier=KNeighborsClassifier(),
             num_generations=10,
             threshold=0.1,
         ),
