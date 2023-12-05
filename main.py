@@ -7,20 +7,29 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from skmultilearn.problem_transform import BinaryRelevance
 
-from lib.base_models import (DependantBinaryRelevance, PatchedClassifierChain,
-                             StackedGeneralization)
-from lib.classifiers import (ClassifierChainWithFTestOrdering,
-                             ClassifierChainWithGeneticAlgorithm,
-                             ClassifierChainWithLOP,
-                             PartialClassifierChainWithLOP, StackingWithFTests)
-from metrics.pipeline import (DatasetsLoader, DatasetsLoaderNormalized, MetricsPipeline,
-                              MetricsPipelineRepository)
+from lib.base_models import (
+    DependantBinaryRelevance,
+    PatchedClassifierChain,
+    StackedGeneralization,
+)
+from lib.classifiers import (
+    ClassifierChainWithFTestOrdering,
+    ClassifierChainWithGeneticAlgorithm,
+    ClassifierChainWithLOP,
+    PartialClassifierChainWithLOP,
+    StackingWithFTests,
+)
+from metrics.pipeline import (
+    DatasetsLoaderNormalized,
+    MetricsPipeline,
+    MetricsPipelineRepository,
+)
 
 from metrics.analysis import analyse_summarized_metrics
 
 
 def setup_logging() -> None:
-    LOGGING_FORMAT="%(asctime)s | %(levelname)s | %(message)s"
+    LOGGING_FORMAT = "%(asctime)s | %(levelname)s | %(message)s"
     logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
 
 
@@ -30,37 +39,37 @@ PIPELINE_RESULTS_FILE = f"./data/metrics_{BASE_FILE_NAME}.csv"
 SUMMARIZED_RESULTS_FILE = f"./data/summarized_result_{BASE_FILE_NAME}.csv"
 RANKED_FILE_NAME = "./data/ranked_for_{score_name}.csv"
 
+
 def build_repository() -> MetricsPipelineRepository:
     return MetricsPipelineRepository(PIPELINE_RESULTS_FILE)
 
 
 def build_dataset_loader() -> DatasetsLoaderNormalized:
-    return DatasetsLoaderNormalized([
-        # [done] fast datasets
-        "birds",
-        "emotions",
-        "scene",
-        
-        # [done] not so fast datasets
-        "yeast",
-        "enron",
-        "genbase",
-        "medical",
+    return DatasetsLoaderNormalized(
+        [
+            # [done] fast datasets
+            "birds",
+            "emotions",
+            "scene",
+            # [done] not so fast datasets
+            "yeast",
+            "enron",
+            "genbase",
+            "medical",
+            # [done] slow datasets
+            "tmc2007_500",
+            # impossibly slow datasets
+            # "delicious",
+            # "bibtex",
+            # "mediamill",
+        ]
+    )
 
-        # [done] slow datasets
-        "tmc2007_500",
-
-        # impossibly slow datasets
-        # "delicious",
-        # "bibtex",
-        # "mediamill",
-    ])
 
 def build_models_list() -> Dict[str, Any]:
     return {
         "baseline_binary_relevance_model": BinaryRelevance(
-            classifier=KNeighborsClassifier(),
-            require_dense=[False, True]
+            classifier=KNeighborsClassifier(), require_dense=[False, True]
         ),
         "baseline_stacked_generalization": StackedGeneralization(
             base_classifier=KNeighborsClassifier(),
@@ -146,6 +155,7 @@ def build_models_list() -> Dict[str, Any]:
         ),
     }
 
+
 DATASETS_INFO_TO_CSV = "datasets_info_to_csv"
 DESCRIBE_DATASETS = "describe_datasets"
 DESCRIBE_METRICS = "describe_metrics"
@@ -169,8 +179,9 @@ if __name__ == "__main__":
             RUN_MODELS,
             SUMMARIZED_METRICS_ANALYSIS,
         ],
-        action="store")
-    
+        action="store",
+    )
+
     args = parser.parse_args()
 
     repository = build_repository()
@@ -180,29 +191,29 @@ if __name__ == "__main__":
     if args.task == DESCRIBE_DATASETS:
         loader.load()
         loader.describe_log()
-    
+
     if args.task == DATASETS_INFO_TO_CSV:
         loader.load()
         result = loader.describe_json()
 
         df = pd.DataFrame(result)
         df.to_csv("./data/datasets_info.csv", index=False)
-    
+
     if args.task == DESCRIBE_METRICS:
         repository.load_from_file()
         repository.describe_log()
-    
+
     if args.task == METRICS_TO_CSV:
         repository.load_from_file()
         result = repository.describe_dict()
 
         df = pd.DataFrame(result)
         df.to_csv(SUMMARIZED_RESULTS_FILE, index=False)
-    
+
     if args.task == SUMMARIZED_METRICS_ANALYSIS:
         df = pd.read_csv(SUMMARIZED_RESULTS_FILE)
         analyse_summarized_metrics(df, RANKED_FILE_NAME)
-    
+
     if args.task == RUN_MODELS:
         pipe = MetricsPipeline(repository, loader, models, N_FOLDS)
         pipe.run()
