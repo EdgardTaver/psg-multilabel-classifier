@@ -8,7 +8,10 @@ help: ## prints this help
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 list-requirements: ## lists requirements to a requirements file
-	python -m pipreqs.pipreqs
+	python3.8 -m pipreqs.pipreqs
+
+list-requirements-force: ## lists requirements to a requirements file
+	python3.8 -m pipreqs.pipreqs --force
 
 install-requirements: ## install the requirements from the requirements file
 	pip3.8 install --upgrade pip
