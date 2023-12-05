@@ -112,27 +112,25 @@ def build_models_list() -> Dict[str, Any]:
             base_classifier=KNeighborsClassifier(),
             num_generations=50,
         ),
-        "partial_classifier_chain_with_lop-num_generations=10": PartialClassifierChainWithLOP(
-            base_classifier=KNeighborsClassifier(),
-            num_generations=10,
-        ),
-        "partial_classifier_chain_with_lop-num_generations=25": PartialClassifierChainWithLOP(
-            base_classifier=KNeighborsClassifier(),
-            num_generations=25,
-        ),
-        "partial_classifier_chain_with_lop-num_generations=50": PartialClassifierChainWithLOP(
+        "partial_classifier_chain_with_lop-num_generations=50-threshold=0.01": PartialClassifierChainWithLOP(
             base_classifier=KNeighborsClassifier(),
             num_generations=50,
+            threshold=0.01,
         ),
-        "partial_classifier_chain_with_lop-num_generations=10-threshold=0.001": PartialClassifierChainWithLOP(
+        "partial_classifier_chain_with_lop-num_generations=25-threshold=0.01": PartialClassifierChainWithLOP(
             base_classifier=KNeighborsClassifier(),
-            num_generations=10,
-            threshold=0.001,
+            num_generations=25,
+            threshold=0.01,
         ),
         "partial_classifier_chain_with_lop-num_generations=10-threshold=0.01": PartialClassifierChainWithLOP(
             base_classifier=KNeighborsClassifier(),
             num_generations=10,
             threshold=0.01,
+        ),
+        "partial_classifier_chain_with_lop-num_generations=10-threshold=0.001": PartialClassifierChainWithLOP(
+            base_classifier=KNeighborsClassifier(),
+            num_generations=10,
+            threshold=0.001,
         ),
         "partial_classifier_chain_with_lop-num_generations=10-threshold=0.025": PartialClassifierChainWithLOP(
             base_classifier=KNeighborsClassifier(),
