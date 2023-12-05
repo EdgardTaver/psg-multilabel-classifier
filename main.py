@@ -140,10 +140,10 @@ def build_models_list() -> Dict[str, Any]:
             num_generations=10,
             threshold=0.1,
         ),
-        # "classifier_chain_with_genetic_algorithm-num_generations=5": ClassifierChainWithGeneticAlgorithm(
-        #     base_classifier=KNeighborsClassifier(),
-        #     num_generations=5,
-        # ),
+        "classifier_chain_with_genetic_algorithm-num_generations=5": ClassifierChainWithGeneticAlgorithm(
+            base_classifier=KNeighborsClassifier(),
+            num_generations=5,
+        ),
     }
 
 DATASETS_INFO_TO_CSV = "datasets_info_to_csv"
