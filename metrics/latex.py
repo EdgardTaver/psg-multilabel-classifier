@@ -26,20 +26,20 @@ SCORES_CAMEL_CASE = {
 
 TABLE_TEMPLATE = """
 \\begin{{table}}[htbp]
-	\centering
-	\caption{{Resultados obtidos para {score_name} ({n})}}
+	\\centering
+	\\caption{{Resultados obtidos para {score_name} ({n})}}
 		\\begin{{tabular}}
         {{ p{{0.88in}} p{{0.88in}} p{{0.88in}} p{{0.88in}} p{{0.88in}} p{{0.88in}} }}
         
         {content}
 
-        \end{{tabular}}
-	\label{{tab:metricsFor{score_name_camel_case}_{n}}}
-  \source{{Edgard Taver, 2023}}
-\end{{table}}
+        \\end{{tabular}}
+	\\label{{tab:metricsFor{score_name_camel_case}_{n}}}
+  \\source{{Edgard Taver, 2023}}
+\\end{{table}}
 """
 
-def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> str:
+def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> None:
     def get_tuple(dataset_name: str) -> str:
         dataset_name_std = f"{dataset_name}_std"
         
@@ -85,8 +85,8 @@ def ranked_metrics_to_latex(ranked_metrics: pd.DataFrame, score_name: str) -> st
     line = "{model_name} & {value_1} & {value_2} & {value_3} & {value_4} & {value_5} \\\\ \\\\"
     # the extra "\\" at the end is to ensure some space between the lines
 
-    header = "\hline\n{model_col} & {data_1} & {data_2} & {data_3} & {data_4} & {data_5} \\\\ \n\hline \\\\"
-    footer = "\hline \\ \n {diff_coll} & {diff_1} & {diff_2} & {diff_3} & {diff_4} & {diff_5} \\\\ \n\hline \\\\"
+    header = "\\hline\n{model_col} & {data_1} & {data_2} & {data_3} & {data_4} & {data_5} \\\\ \n\\hline \\\\"
+    footer = "\\hline \\ \n {diff_coll} & {diff_1} & {diff_2} & {diff_3} & {diff_4} & {diff_5} \\\\ \n\\hline \\\\"
 
     header_for_first_part = header.format(
         model_col="Modelo",
