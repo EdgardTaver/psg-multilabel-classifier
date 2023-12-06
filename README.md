@@ -1,6 +1,6 @@
 # psg-multilabel-classifier
 
-Trabalho de Conclusão de Curso, com foco em classificadores multirrótulo.
+Trabalho de Conclusão de Curso, para graduação em Sistemas de Informação pela EACH-USP. Este projeto tem como foco o desenvolvimento de classificadores multirrótulo inéditos.
 
 ## Testes unitário
 
