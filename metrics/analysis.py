@@ -13,7 +13,7 @@ ALL_DATASETS = [
 ]
 
 
-def analyse_summarized_metrics(summarized_metrics: pd.DataFrame, ranked_file_name: str) -> pd.DataFrame:
+def analyse_summarized_metrics(summarized_metrics: pd.DataFrame, ranked_file_name: str) -> None:
     analysis = summarized_metrics.copy()
 
     analysis["model_name"] = analysis["model"].apply(lambda x: x.split("-")[0])
@@ -85,8 +85,12 @@ def analyse_summarized_metrics(summarized_metrics: pd.DataFrame, ranked_file_nam
                 actual_row[f"{dataset_name}_std"] = row[f"{score_name}_std"]
             
             current_counter += 1
+        
+        transformed_rows.append(actual_row)
+        current_counter = 0
     
         transposed_for_score = pd.DataFrame(transformed_rows)
+
         best_for_score = calculate_best_awards(transposed_for_score)
         ranked_for_score = calculate_ranking(best_for_score)
         ranked_for_score.to_csv(ranked_file_name.format(score_name=score_name), index=False)
