@@ -67,7 +67,7 @@ def analyse_summarized_metrics(summarized_metrics: pd.DataFrame, ranked_file_nam
         transformed_rows = []
         actual_row = {}
 
-        for i, row in best_for_score.iterrows():
+        for _, row in best_for_score.iterrows():
             dataset_name = row["dataset"]
 
             if current_counter == count_of_datasets:
@@ -87,10 +87,8 @@ def analyse_summarized_metrics(summarized_metrics: pd.DataFrame, ranked_file_nam
             current_counter += 1
         
         transformed_rows.append(actual_row)
-        current_counter = 0
-    
-        transposed_for_score = pd.DataFrame(transformed_rows)
 
+        transposed_for_score = pd.DataFrame(transformed_rows)
         best_for_score = calculate_best_awards(transposed_for_score)
         ranked_for_score = calculate_ranking(best_for_score)
         ranked_for_score.to_csv(ranked_file_name.format(score_name=score_name), index=False)
