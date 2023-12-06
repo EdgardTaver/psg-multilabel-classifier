@@ -57,7 +57,7 @@ def build_dataset_loader() -> DatasetsLoaderNormalized:
             "genbase",
             "medical",
             # [done] slow datasets
-            # "tmc2007_500",
+            "tmc2007_500",
             # impossibly slow datasets
             # "delicious",
             # "bibtex",
