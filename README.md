@@ -19,3 +19,10 @@ Caso queria executar um teste específico, utilize uma opção especial do `pyte
 ```sh
 pytest -k <nome_do_test>
 ```
+
+## Tarefas
+
+- [ ] Adicionar tipagem correta para todas as classes.
+- [ ] Resolver todos os "TODO"s deixados no código.
+- [ ] Entender como deixar os modelos imunes aos dados serem passados como matriz esparsa ou matriz normal.
+  - [ ] [Isto](https://stackoverflow.com/questions/7922487/how-to-transform-numpy-matrix-or-array-to-scipy-sparse-matrix) pode ser útil.
