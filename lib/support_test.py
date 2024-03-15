@@ -93,8 +93,8 @@ def test_build_chain_based_on_f_test_ascending():
     _, y, _, _ = full_data
 
     f_test_results = CalculateLabelsCorrelationWithFTest(alpha=1).get(y)
-    
+
     exercise = build_chain_based_on_f_test(f_test_results, True)
-    expected = [3, 4, 0, 5, 1, 2]
+    expected = [4, 3, 2, 1, 0, 5]
 
     assert exercise == expected

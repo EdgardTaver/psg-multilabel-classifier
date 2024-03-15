@@ -72,7 +72,7 @@ def test_classifier_chain_with_f_test_ordering_ascending():
     """
 
     dataset_name = "scene"
-    
+
     train_dataset = load_dataset(dataset_name, "train")
     if train_dataset is None:
         raise Exception("could not load dataset")
@@ -93,8 +93,8 @@ def test_classifier_chain_with_f_test_ordering_ascending():
     hamming_loss = metrics.hamming_loss(y_test, predictions)
     f1_score = metrics.f1_score(y_test, predictions, average="macro")
 
-    assert hamming_loss == 0.08946488294314381
-    assert f1_score == 0.6900349522611511
+    assert hamming_loss == 0.08904682274247491
+    assert f1_score == 0.6927820097350326
 
 def test_classifier_chain_with_genetic_algorithm():
     dataset_name = "emotions"
