@@ -66,7 +66,7 @@ Agora, instale as dependências:
 python -m pip install -r requirements.txt
 ```
 
-## Testes unitário
+## Testes unitários
 
 Tanto os modelos de base, quanto os modelos principais, possuem testes unitários. Por meio de um `random_state` fixo, eles testam o modelo com um conjunto de dados reduzido, obtendo resultados determinísticos.
 
